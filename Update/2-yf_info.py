@@ -1,6 +1,8 @@
 import pandas as pd
 import yfinance as yf
 import timeit
+import os
+import sqlite3
 
 def get_info(tickers):
     column_names = ['sector',
@@ -65,18 +67,15 @@ def get_info(tickers):
 def main():
     yf.pdr_override() 
 
-    my_tickers = ['AAPL', 'AMZN']    
-    print(get_info(my_tickers))
-    # DB_PATH = os.getenv('DB_PATH')
-    # conn = sqlite3.connect(DB_PATH + "/stockradar.db")
-    # cur = conn.cursor()
+    DB_PATH = os.getenv('DB_PATH')
+    conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
+    cur = conn.cursor()
  
-    # # income info
-    # my_tickers = """SELECT Symbol FROM _yf_financials_netincome_scores WHERE `Net Income` > 1000000 ORDER BY NetIncomePctChange DESC LIMIT 100"""
-    # cur.execute(my_tickers)
-    # tickers = cur.fetchall()
-    # tickers = [x[0] for x in tickers]
-    # get_info(tickers).to_sql('_yf_info', conn, if_exists='replace')  
+    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1"""
+    cur.execute(my_tickers)
+    tickers = cur.fetchall()
+    tickers = [x[0] for x in tickers]
+    get_info(tickers).to_sql('_yf_info', conn, if_exists='replace')  
 
     # # revenue info
     # my_tickers = """SELECT Symbol FROM _yf_financials_revenue_scores WHERE `Total Revenue` > 1000000 ORDER BY RevenuePctChange DESC LIMIT 100"""
@@ -106,8 +105,8 @@ def main():
     # tickers = [x[0] for x in tickers]
     # get_info(tickers).to_sql('_yf_info', conn, if_exists='append')
     
-    # cur.close()
-    # conn.close()
+    cur.close()
+    conn.close()
 
 if __name__ == "__main__":
     print(timeit.timeit(main,number=1))
