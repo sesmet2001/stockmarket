@@ -1,6 +1,8 @@
 import yfinance as yf
 import plotly.graph_objs as go
 
+# test
+
 my_www_path = '/var/www/html'
 my_periods = {'30d':'30 Days','1y':"Year",'5y':'5 Years'}
 
