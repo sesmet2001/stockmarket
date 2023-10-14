@@ -100,6 +100,8 @@ def main():
         conn_info.close()
 
     except Exception as e:
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        print(exception_traceback.tb_lineno)
         print(e)
     
     
