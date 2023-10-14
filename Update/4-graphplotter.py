@@ -79,7 +79,7 @@ def main():
         conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
         cur_info = conn_info.cursor()
 
-        # Plot Portfolio stocks
+        # Plot Portfolio Stocks
         my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
         cur_info.execute(my_ticker_query)    
         my_tickers_list = cur_info.fetchall()
@@ -89,7 +89,7 @@ def main():
                 sql_stock = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date <= '" + str(my_end) + "'",conn_data)
                 my_stock_df = pd.DataFrame(sql_stock)
                 if type(my_stock_df["AdjClose"].iloc[0:1][0]) == np.float64:
-                    plotgraph(conn_data,my_ticker,DB_PATH + "/graphs" + "/" + datetime.today().strftime('%Y-%m-%d')) 
+                    plotgraph(conn_data,my_ticker,DB_PATH + "/graphs" + "/") 
             except:
                 print(my_ticker + ": An exception occurred")
                 continue
