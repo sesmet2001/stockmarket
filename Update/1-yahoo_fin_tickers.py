@@ -26,13 +26,28 @@ def main():
         pd_nasdaq_tickers = pd.DataFrame({"Ticker": lst_nasdaq_tickers})
         pd_nasdaq_tickers.set_index(['Ticker'])
 
+        # Portfolio tickers
+        lst_portfolio_tickers = ["NVDA","VUSA","AMZN","AMD","ARM","CRM","ASML","ZIM","ALNOV.PA","HCP"]
+        pd_portfolio_tickers = pd.DataFrame({"Ticker": lst_portfolio_tickers})
+        pd_portfolio_tickers.set_index(['Ticker'])
+
+        # Precious metals
+        lst_precious_metals_tickers = ["GC=F","SI=F"]
+        pd_precious_metals_tickers = pd.DataFrame({"Ticker": lst_precious_metals_tickers})
+        pd_precious_metals_tickers.set_index(['Ticker'])
+
+        # Crypto
+        lst_crypto_tickers = ["BTC-USD","ETH-USD"]
+        pd_crypto_tickers = pd.DataFrame({"Ticker": lst_crypto_tickers})
+        pd_crypto_tickers.set_index(['Ticker'])
+
         # # Other tickers
         # lst_other_tickers = si.tickers_other()
         # pd_other_tickers = pd.DataFrame({"Ticker": lst_other_tickers})
         # pd_other_tickers.set_index(['Ticker'])
 
         # Concat and remove duplicates
-        pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers])
+        pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
 
         # Mark tickers
@@ -46,6 +61,15 @@ def main():
             for my_ticker in lst_nasdaq_tickers:
                 if my_ticker == row['Ticker']:
                     pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Nasdaq"] = 1
+            for my_ticker in lst_portfolio_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
+            for my_ticker in lst_precious_metals_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
+            for my_ticker in lst_crypto_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Crypto"] = 1
 
         pd_all_tickers.to_sql('_yahoo_fin_tickers', con=conn_info, if_exists='replace')
         conn_info.close()

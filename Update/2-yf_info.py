@@ -71,11 +71,89 @@ def main():
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur = conn.cursor()
  
-    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1"""
+    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers"""
     cur.execute(my_tickers)
     tickers = cur.fetchall()
     tickers = [x[0] for x in tickers]
     get_info(tickers).to_sql('_yf_info', conn, if_exists='replace')  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # # revenue info
     # my_tickers = """SELECT Symbol FROM _yf_financials_revenue_scores WHERE `Total Revenue` > 1000000 ORDER BY RevenuePctChange DESC LIMIT 100"""
