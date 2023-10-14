@@ -19,7 +19,7 @@ def plotgraph(conn,ticker,imagepath):
         #df.set_index('Date',inplace=True)
         plt.subplot(2, 1, 1)
         plt.title(ticker)
-        plt.plot(pd.to_datetime(df['Date'],format= "%Y-%m-%dT%H:%M:%S").dt.date,df['Close'], color = 'cornflowerblue', label = 'Close')
+        plt.plot(pd.to_datetime(df['Date'],format='mixed').dt.date,df['Close'], color = 'cornflowerblue', label = 'Close')
         #plt.plot(pd.to_datetime(df['Date']).dt.date,df['Low'], color = 'orange', label = 'Low')
         #plt.plot(pd.to_datetime(df['Date']).dt.date,df['High'], color = 'green', label = 'High')
         plt.plot(pd.to_datetime(df['Date']).dt.date,df['BB_low'], color = 'red', label = 'BB_low')
