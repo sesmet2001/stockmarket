@@ -15,7 +15,7 @@ def plotgraph(conn,ticker,imagepath):
         sql_query = pd.read_sql_query("""SELECT * from '""" + ticker + """' ORDER BY Date DESC LIMIT 400""",conn)
         df = pd.DataFrame(sql_query, columns=['Date','Ticker','Adj Close','Close','High','Low','Open','Volume','Percent Change','SMA50','SMA150','SMA200','TEMA5','TEMA20','BB_low','BB_mid','BB_up','RSI'])
         print(ticker)
-        print(df.iloc[-1])
+        #print(df.iloc[-1])
         #df.set_index('Date',inplace=True)
         plt.subplot(2, 1, 1)
         plt.title(ticker)
