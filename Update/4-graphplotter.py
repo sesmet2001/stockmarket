@@ -80,7 +80,7 @@ def main():
         cur_info = conn_info.cursor()
 
         # Plot Portfolio Stocks
-        my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
+        my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1 OR Dow == 1"""
         cur_info.execute(my_ticker_query)    
         my_tickers_list = cur_info.fetchall()
         my_tickers = [x[0] for x in my_tickers_list]
