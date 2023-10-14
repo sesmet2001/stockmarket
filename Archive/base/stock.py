@@ -1,5 +1,5 @@
 from base.asset import Asset
-#import TA-lib.abstract as ta
+import talib.abstract as ta
 import pandas as pd
 import os
 import sqlite3
