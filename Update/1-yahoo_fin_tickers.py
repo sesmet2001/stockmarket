@@ -27,7 +27,7 @@ def main():
         pd_nasdaq_tickers.set_index(['Ticker'])
 
         # Portfolio tickers
-        lst_portfolio_tickers = ["NVDA","VUSA","AMZN","AMD","ARM","CRM","ASML","ZIM","ALNOV.PA","HCP"]
+        lst_portfolio_tickers = ["NVDA","VUSA.AS","AMZN","AMD","ARM","CRM","ASML","ZIM","ALNOV.PA","HCP"]
         pd_portfolio_tickers = pd.DataFrame({"Ticker": lst_portfolio_tickers})
         pd_portfolio_tickers.set_index(['Ticker'])
 
