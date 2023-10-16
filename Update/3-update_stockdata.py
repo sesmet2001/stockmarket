@@ -26,11 +26,11 @@ def main():
     cur_info = conn_info.cursor()
 
     # DEFINE START END #########
-    sqlexists = """SELECT count(name) FROM sqlite_master WHERE type='table' AND name='A'"""
+    sqlexists = """SELECT count(name) FROM sqlite_master WHERE type='table' AND name='CRM'"""
     cur_data.execute(sqlexists)
     if cur_data.fetchone()[0]==1:
             print('Table exists.')
-            sqldates = """SELECT Date FROM A ORDER BY date DESC LIMIT 1"""
+            sqldates = """SELECT Date FROM CRM ORDER BY date DESC LIMIT 1"""
             start = cur_data.execute(sqldates).fetchone()
             start = datetime.strptime(start[0], '%Y-%m-%d %H:%M:%S')
             start = start.date() + timedelta(days=2)
