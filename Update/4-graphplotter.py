@@ -9,7 +9,6 @@ import matplotlib.dates as mdates
 from matplotlib.dates import HourLocator, DayLocator, DateFormatter
 import seaborn as sns
 import sys
-import mplfinance as mpf
 import plotly.io as pio 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
