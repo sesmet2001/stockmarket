@@ -30,9 +30,9 @@ def main():
     cur_data.execute(sqlexists)
     if cur_data.fetchone()[0]==1:
             print('Table exists.')
-            sqldates = """SELECT Date FROM CRM ORDER BY date DESC LIMIT 1"""
+            sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
             start = cur_data.execute(sqldates).fetchone()
-            start = datetime.strptime(start[0], '%Y-%m-%d %H:%M:%S')
+            start = datetime.strptime(start[0], '%Y-%m-%dT%H:%M:%S')
             start = start.date() + timedelta(days=2)
     else:
             start = datetime(2020, 1, 1)
