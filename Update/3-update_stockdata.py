@@ -39,7 +39,7 @@ def main():
 
     #start = datetime(2021, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
-    #end = "2022-06-20"
+    my_end = "2023-10-13"
     print(start)
     print(my_end)
 
