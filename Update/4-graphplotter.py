@@ -80,7 +80,7 @@ def plotgraph3(conn,ticker,imagepath):
         df.set_index('Date', inplace=True)
         print(ticker)
 
-        fig = make_subplots(rows=2,cols=1,vertical_spacing = 5.00,row_heights=[0.7, 0.3],subplot_titles=(ticker + " Price ($)", "RSI"))
+        fig = make_subplots(rows=2,cols=1,vertical_spacing = 0.10,row_heights=[0.7, 0.3],subplot_titles=(ticker + " Price ($)", "RSI"))
         fig.add_trace(
             go.Candlestick(x=df.index,open=df['Open'],high=df['High'],low=df['Low'],close=df['Close'],showlegend=False),
             row=1, col=1
