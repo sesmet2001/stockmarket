@@ -24,7 +24,8 @@ def find_TEMA5_TEMA20_crossover(TEMA5, prevTEMA5,TEMA20,RSI):
         return "bullish crossover"
     elif TEMA5 < TEMA20 and prevTEMA5 > TEMA20 and RSI > 65:
         return "bearish crossover"
-    return None
+    else:
+        return None
 
 def main():
 
