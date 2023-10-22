@@ -39,7 +39,6 @@ def main():
 
     #start = datetime(2021, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
-    my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(start)
     print(my_end)
 
@@ -49,28 +48,11 @@ def main():
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
-    #my_tickers = ["CRM"]
+    my_tickers = ["CRM"]
 
-    # DOWNLOAD DATA IN CHUNKS #
-    chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
-    try:
-        for chunk in chunks:
-            print(str(chunk) + "\n")
-            data = yf.download(" ".join(chunk),start=start,end=my_end,actions=False)
-            for my_ticker in chunk:
-                my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
-                my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
-                #my_ticker_df["Ticker"] = my_ticker
-                if not pd.isnull(my_ticker_df['AdjClose']).all():
-                    my_ticker_df.to_sql(my_ticker, conn_data, if_exists='append')
-                else:
-                    print(my_ticker + " has no data.")
-    except Exception as ex:
-        print(ex)
-        pass
-    
     for my_ticker in my_tickers:
         try:
+            my_stock = Stock()
             sql_stock = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date <= '" + str(my_end) + "'",conn_data)
             my_stock_df = pd.DataFrame(sql_stock)
             if type(my_stock_df["AdjClose"].iloc[0:1][0]) == np.float64:
