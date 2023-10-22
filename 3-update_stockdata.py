@@ -88,7 +88,7 @@ def main():
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
                 #my_ticker_df["Ticker"] = my_ticker
                 if not pd.isnull(my_ticker_df['AdjClose']).all():
-                    my_ticker_df.to_sql(my_ticker, conn_data, if_exists='append')
+                    my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
                 else:
                     print(my_ticker + " has no data.")
     except Exception as e:
