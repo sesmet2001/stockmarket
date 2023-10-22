@@ -122,8 +122,8 @@ class Stock(Asset):
             )
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=2, col=1)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=2, col=1)
-            my_buy_signals = self.plotdata[self.plotdata['TEMA5_TEMA20_crossover'] == "bullish crossover"]
-            my_sell_signals = self.plotdata[self.plotdata['TEMA5_TEMA20_crossover'] == "bearish crossover"]
+            my_buy_signals = self.plotdata[self.plotdata['TEMA20_SMA50_crossover'] == "bullish crossover"]
+            my_sell_signals = self.plotdata[self.plotdata['TEMA20_SMA50_crossover'] == "bearish crossover"]
             for i,row in my_buy_signals.iterrows():
                 fig.add_vline(x=row.Date2, line_width=2, line_dash="dash", line_color="green")
             for i,row in my_sell_signals.iterrows():

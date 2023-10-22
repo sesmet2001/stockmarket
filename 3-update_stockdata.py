@@ -12,12 +12,13 @@ import talib.abstract as ta
 from base.stock import Stock
 import socket
 
-def find_TEMA5_SMA50_crossover(prevTEMA5,TEMA5,prevSMA50,SMA50):
-    if TEMA5 > SMA50 and prevTEMA5 < prevSMA50:
+def find_TEMA20_SMA50_crossover(prevTEMA20,TEMA20,prevSMA50,SMA50):
+    if prevTEMA20 < prevSMA50 and TEMA20 > SMA50:
         return "bullish crossover"
-    elif TEMA5 < SMA50 and prevTEMA5 > prevSMA50:
+    elif prevTEMA20 > prevSMA50 and TEMA20 < SMA50:
         return "bearish crossover"
-    return None
+    else:
+        return None
 
 def find_TEMA5_TEMA20_RSI_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20,prevRSI,RSI):
     if ((TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20) and (prevRSI < 30 and RSI > 30)):
@@ -128,7 +129,7 @@ def main():
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)
                 my_stock.stockdata.dropna(inplace=True)
                 
-                my_stock.stockdata['TEMA5_TEMA20_crossover'] = np.vectorize(find_TEMA5_TEMA20_RSI_crossover)(my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevRSI"],my_stock.stockdata["RSI"])               
+                my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])               
                 my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange)
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
         except Exception as e:
