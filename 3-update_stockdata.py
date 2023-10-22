@@ -19,10 +19,18 @@ def find_TEMA5_SMA50_crossover(TEMA5, prevTEMA5,SMA50):
         return "bearish crossover"
     return None
 
-def find_TEMA5_TEMA20_crossover(TEMA5, prevTEMA5,TEMA20,RSI):
-    if TEMA5 > TEMA20 and prevTEMA5 < TEMA20 and RSI < 35:
+def find_TEMA5_TEMA20_RSI_crossover(TEMA5,prevTEMA5,prevTEMA20,TEMA20,RSI):
+    if TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20 and RSI < 35:
         return "bullish crossover"
-    elif TEMA5 < TEMA20 and prevTEMA5 > TEMA20 and RSI > 65:
+    elif TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20 and RSI > 65:
+        return "bearish crossover"
+    else:
+        return None
+
+def find_TEMA5_TEMA20_crossover(TEMA5,prevTEMA5,prevTEMA20,TEMA20):
+    if TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20:
+        return "bullish crossover"
+    elif TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20:
         return "bearish crossover"
     else:
         return None
@@ -116,9 +124,10 @@ def main():
                 my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
                 my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
                 my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
+                my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)
                 my_stock.stockdata.dropna(inplace=True)
                 
-                my_stock.stockdata['TEMA5_TEMA20_crossover'] = np.vectorize(find_TEMA5_TEMA20_crossover)(my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA20"],my_stock.stockdata["RSI"])
+                my_stock.stockdata['TEMA5_TEMA20_crossover'] = np.vectorize(find_TEMA5_TEMA20_crossover)(my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])
                 my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange)
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
         except Exception as e:
