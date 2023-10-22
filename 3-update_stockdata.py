@@ -10,6 +10,7 @@ import os
 import sys
 import talib.abstract as ta
 from base.stock import Stock
+import socket
 
 def find_TEMA5_SMA50_crossover(TEMA5, prevTEMA5,SMA50):
     if TEMA5 > SMA50 and prevTEMA5 < SMA50:
@@ -51,8 +52,9 @@ def main():
             print('Table exists.')
             sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
             my_start = cur_data.execute(sqldates).fetchone()
-            #my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
-            my_start = datetime.strptime(my_start[0])
+            print(socket.gethostname())
+            my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
+            #my_start = datetime.strptime(my_start[0])
             my_start = my_start.date() + timedelta(days=1)
     else:
             my_start = datetime(2020, 1, 1)
