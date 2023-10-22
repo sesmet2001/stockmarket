@@ -125,7 +125,8 @@ def main():
                 my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
                 my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
                 my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
-                my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)
+                my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
+                my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)
                 my_stock.stockdata.dropna(inplace=True)
                 
