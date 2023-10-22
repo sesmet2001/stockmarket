@@ -63,7 +63,7 @@ def main():
 
     #my_start = datetime(2021, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
-    my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
+    #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
     print(my_end)
 
