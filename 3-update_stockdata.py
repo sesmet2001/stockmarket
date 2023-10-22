@@ -20,9 +20,9 @@ def find_TEMA5_SMA50_crossover(TEMA5, prevTEMA5,SMA50):
     return None
 
 def find_TEMA5_TEMA20_crossover(TEMA5, prevTEMA5,TEMA20,RSI):
-    if TEMA5 > TEMA20 and prevTEMA5 < TEMA20 and RSI < 30:
+    if TEMA5 > TEMA20 and prevTEMA5 < TEMA20 and RSI < 35:
         return "bullish crossover"
-    elif TEMA5 < TEMA20 and prevTEMA5 > TEMA20 and RSI > 70:
+    elif TEMA5 < TEMA20 and prevTEMA5 > TEMA20 and RSI > 65:
         return "bearish crossover"
     return None
 
