@@ -46,24 +46,24 @@ def main():
     cur_info = conn_info.cursor()
 
     # DEFINE START END #########
-    sqlexists = """SELECT count(name) FROM sqlite_master WHERE type='table' AND name='CRM'"""
-    cur_data.execute(sqlexists)
-    if cur_data.fetchone()[0]==1:
-            print('Table exists.')
-            sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
-            my_start = cur_data.execute(sqldates).fetchone()
-            if socket.gethostname() == "aldix":
-                my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
-            else:
-                my_start = datetime.strptime(my_start[0], '%Y-%m-%dT%H:%M:%S')
-            #my_start = datetime.strptime(my_start[0])
-            my_start = my_start.date() + timedelta(days=1)
-    else:
-            my_start = datetime(2020, 1, 1)
+    #sqlexists = """SELECT count(name) FROM sqlite_master WHERE type='table' AND name='CRM'"""
+    #cur_data.execute(sqlexists)
+    #if cur_data.fetchone()[0]==1:
+    #        print('Table exists.')
+    #        sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
+    #        my_start = cur_data.execute(sqldates).fetchone()
+    #        if socket.gethostname() == "aldix":
+    #            my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
+    #        else:
+    #            my_start = datetime.strptime(my_start[0], '%Y-%m-%dT%H:%M:%S')
+    #        #my_start = datetime.strptime(my_start[0])
+    #        my_start = my_start.date() + timedelta(days=1)
+    #else:
+    #        my_start = datetime(2020, 1, 1)
 
-    #my_start = datetime(2021, 1, 1)
+    my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
-    #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
+    my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
     print(my_end)
 
