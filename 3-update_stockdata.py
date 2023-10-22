@@ -12,25 +12,25 @@ import talib.abstract as ta
 from base.stock import Stock
 import socket
 
-def find_TEMA5_SMA50_crossover(TEMA5, prevTEMA5,SMA50):
-    if TEMA5 > SMA50 and prevTEMA5 < SMA50:
+def find_TEMA5_SMA50_crossover(prevTEMA5,TEMA5,prevSMA50,SMA50):
+    if TEMA5 > SMA50 and prevTEMA5 < prevSMA50:
         return "bullish crossover"
-    elif TEMA5 < SMA50 and prevTEMA5 > SMA50:
+    elif TEMA5 < SMA50 and prevTEMA5 > prevSMA50:
         return "bearish crossover"
     return None
 
-def find_TEMA5_TEMA20_RSI_crossover(TEMA5,prevTEMA5,prevTEMA20,TEMA20,RSI):
-    if TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20 and RSI < 35:
+def find_TEMA5_TEMA20_RSI_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20,prevRSI,RSI):
+    if ((TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20) and (prevRSI > 30 and RSI < 30)):
         return "bullish crossover"
-    elif TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20 and RSI > 65:
+    elif ((TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20) and (prevRSI > 70 and RSI < 70)):
         return "bearish crossover"
     else:
         return None
 
-def find_TEMA5_TEMA20_crossover(TEMA5,prevTEMA5,prevTEMA20,TEMA20):
-    if TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20:
+def find_TEMA5_TEMA20_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20,prevRSI,RSI):
+    if ((TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20) and (prevRSI > 30 and RSI < 30)):
         return "bullish crossover"
-    elif TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20:
+    elif ((TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20) and (prevRSI > 70 and RSI < 70)):
         return "bearish crossover"
     else:
         return None
