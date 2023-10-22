@@ -8,20 +8,21 @@ values_list = [[15, 0], [16, 2], [20, 10], [25, 30],
                [35, 50], [40, 45], [41, 25],
                [51, 10], [50, 9]]
 
-def find_crossover(TEMA5, prevTEMA5,SMA50):
-    if TEMA5 > SMA50 and prevTEMA5 < SMA50:
+def find_crossover(TEMA5, prevTEMA5,prevSMA50,SMA50):
+    if TEMA5 > SMA50 and prevTEMA5 < prevSMA50:
         return "bullish crossover"
-    elif TEMA5 < SMA50 and prevTEMA5 > SMA50:
+    elif TEMA5 < SMA50 and prevTEMA5 > prevSMA50:
         return "bearish crossover"
     return None
 
 # creating a pandas dataframe
 df = pd.DataFrame(values_list, columns=['SMA50','TEMA5'])
 df['prevTEMA5'] = df['TEMA5'].shift(1)
+df['prevSMA50'] = df['SMA50'].shift(1)
 df.dropna(inplace=True)
-df['crossover'] = np.vectorize(find_crossover)(df["TEMA5"],df["prevTEMA5"],df["SMA50"])
+df['crossover'] = np.vectorize(find_crossover)(df["TEMA5"],df["prevTEMA5"],df["prevSMA50"],df["SMA50"])
 print(df)
-df.plot.line()
+df.plot.line(y=['SMA50','TEMA5'])
 plt.show()
 #df['SMAOnTopPrevious'] = df['SMAOnTop'].shift(periods=1, fill_value=False)
 #print(df)
