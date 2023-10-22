@@ -52,7 +52,7 @@ def main():
             print('Table exists.')
             sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
             my_start = cur_data.execute(sqldates).fetchone()
-            if socket.gethostname() != "aldix":
+            if socket.gethostname() == "aldix":
                 my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
             else:
                 my_start = datetime.strptime(my_start[0], '%Y-%m-%dT%H:%M:%S')
