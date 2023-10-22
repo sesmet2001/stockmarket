@@ -33,7 +33,7 @@ def main():
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
-    my_plotrange = 100
+    my_plotrange = 75
     yf.pdr_override() 
 
     print(sys.path)
