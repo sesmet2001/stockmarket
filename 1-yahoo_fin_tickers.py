@@ -32,7 +32,7 @@ def main():
         pd_portfolio_tickers.set_index(['Ticker'])
 
         # Precious metals
-        lst_precious_metals_tickers = ["GC=F","SI=F"]
+        lst_precious_metals_tickers = ["GC=F","SI=F","PA=F","PL=F"]
         pd_precious_metals_tickers = pd.DataFrame({"Ticker": lst_precious_metals_tickers})
         pd_precious_metals_tickers.set_index(['Ticker'])
 
