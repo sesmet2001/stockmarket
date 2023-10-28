@@ -23,7 +23,7 @@ def find_TEMA20_SMA50_crossover(prevTEMA20,TEMA20,prevSMA50,SMA50):
 def find_TEMA5_TEMA20_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20):
     if prevTEMA5 < prevTEMA20 and TEMA5 > TEMA20:
         return "bullish crossover"
-    elif prevTEMA20 > prevTEMA5 and TEMA20 < TEMA5:
+    elif prevTEMA5 > prevTEMA20 and TEMA5 < TEMA20:
         return "bearish crossover"
     else:
         return None
