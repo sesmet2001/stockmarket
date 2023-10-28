@@ -37,7 +37,7 @@ def main():
         pd_precious_metals_tickers.set_index(['Ticker'])
 
         # Crypto
-        lst_crypto_tickers = ["BTC-USD","ETH-USD"]
+        lst_crypto_tickers = ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"]
         pd_crypto_tickers = pd.DataFrame({"Ticker": lst_crypto_tickers})
         pd_crypto_tickers.set_index(['Ticker'])
 
