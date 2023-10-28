@@ -125,9 +125,9 @@ class Stock(Asset):
             my_buy_signals = self.plotdata[self.plotdata['TEMA5_TEMA20_crossover'] == "bullish crossover"]
             my_sell_signals = self.plotdata[self.plotdata['TEMA5_TEMA20_crossover'] == "bearish crossover"]
             for i,row in my_buy_signals.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.5, line_dash="dash", line_color="green")
+                fig.add_vline(x=row.Date2, line_width=2, opacity=0.2, line_dash="dash", line_color="green")
             for i,row in my_sell_signals.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.5, line_dash="dash", line_color="red")
+                fig.add_vline(x=row.Date2, line_width=2, opacity=0.2, line_dash="dash", line_color="red")
 
             pio.write_image(fig, my_imagepath + self.ticker + ".png") 
 
