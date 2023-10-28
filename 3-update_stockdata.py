@@ -20,6 +20,14 @@ def find_TEMA20_SMA50_crossover(prevTEMA20,TEMA20,prevSMA50,SMA50):
     else:
         return None
 
+def find_TEMA5_TEMA20_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20):
+    if prevTEMA5 < prevTEMA20 and TEMA5 > TEMA20:
+        return "bullish crossover"
+    elif prevTEMA20 > prevTEMA5 and TEMA20 < TEMA5:
+        return "bearish crossover"
+    else:
+        return None
+
 def find_TEMA5_TEMA20_RSI_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20,prevRSI,RSI):
     if ((TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20) and (prevRSI < 30 and RSI > 30)):
         return "bullish crossover"
@@ -130,7 +138,8 @@ def main():
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)
                 my_stock.stockdata.dropna(inplace=True)
                 
-                my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])               
+                #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
+                my_stock.stockdata['TEMA5_TEMA20_crossover'] = np.vectorize(find_TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
                 my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange)
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
         except Exception as e:
