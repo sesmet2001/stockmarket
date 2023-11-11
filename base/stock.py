@@ -93,7 +93,7 @@ class Stock(Asset):
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             self.plotdata['Date2'] = self.plotdata['Date']
             self.plotdata.set_index('Date',inplace=True)
-            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.05,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + " Price ($)", "RSI", "MACD", "Volume"))
+            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.05,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
             fig.update_layout(width=1200, height=1200, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
             
@@ -148,15 +148,15 @@ class Stock(Asset):
             )
 
             # Add signals
-            my_buy_signals = self.plotdata[self.plotdata[my_strategy] == "+"]
-            my_sell_signals = self.plotdata[self.plotdata[my_strategy] == "-"]
-            for i,row in my_buy_signals.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
-            for i,row in my_sell_signals.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
+            #my_buy_signals = self.plotdata[self.plotdata[my_strategy] == "+"]
+            #my_sell_signals = self.plotdata[self.plotdata[my_strategy] == "-"]
+            #for i,row in my_buy_signals.iterrows():
+            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
+            #for i,row in my_sell_signals.iterrows():
+            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
 
-            pio.write_image(fig, my_imagepath + self.ticker + ".png") 
-
+            pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido") 
+            return 1
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             print("plot error " + str(exception_traceback.tb_lineno))

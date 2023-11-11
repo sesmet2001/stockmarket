@@ -8,6 +8,7 @@ import numpy as np
 import sqlite3
 import os
 import talib.abstract as ta
+from base.stock import Stock
 
 def main():
 

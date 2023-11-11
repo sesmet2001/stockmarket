@@ -12,6 +12,8 @@ import talib.abstract as ta
 from base.stock import Stock
 import socket
 from patterns.cross import Cross
+import traceback
+import vectorbt as vbt
 
 def TEMA20_SMA50_crossover(prevTEMA20,TEMA20,prevSMA50,SMA50):
     if prevTEMA20 < prevSMA50 and TEMA20 > SMA50:
@@ -73,7 +75,7 @@ def main():
     #else:
     #        my_start = datetime(2020, 1, 1)
 
-    my_start = datetime(2020, 1, 1)
+    my_start = datetime(2023, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -84,10 +86,11 @@ def main():
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
     my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 AND Ticker != 'ARM' OR Crypto == 1 OR PreciousMetals == 1"""
+    #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
-    #my_tickers = ["AAPL","CRM"]
+    #my_tickers = ["MSFT","NVDA"]
 
     # DOWNLOAD DATA IN CHUNKS #
     chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
@@ -104,13 +107,21 @@ def main():
                 else:
                     print(my_ticker + " has no data.")
     except Exception as e:
-        print(e)
+        # Get the exception information including the line number
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        
+        # Extract the line number
+        line_number = exc_tb.tb_lineno
+        
+        # Print the exception message along with the line number
+        print(f"Exception occurred on line {line_number}: {e}")
         pass
     
     for my_ticker in my_tickers:
         try:
             my_stock = Stock(conn_data,my_ticker,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
+                print(my_stock.ticker)
                 my_stock.dropna()
                 my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
                 my_stock.stockdata["SMA10"] = ta.SMA(my_stock.stockdata['Close'],10)
@@ -131,15 +142,24 @@ def main():
                 my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
                 my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)
-                my_stock.stockdata['X_TEMA5_TEMA20'] = Cross(my_stock,"TEMA5","TEMA20").detect()
+                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], 1, 0)
+                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], 1, 0)
+                #my_stock.stockdata['X_TEMA5_TEMA20'] = Cross(my_stock,"TEMA5","TEMA20").detect()
                 #my_stock.stockdata.dropna(inplace=True)
                 #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
                 #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
-            
                 my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategy)
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
+
         except Exception as e:
-            print(my_ticker + ": An exception " + str(e) + " occurred")
+            # Get the exception information including the line number
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            
+            # Extract the line number
+            line_number = exc_tb.tb_lineno
+            
+            # Print the exception message along with the line number
+            print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
             continue
 
     cur_data.close()

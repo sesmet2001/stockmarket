@@ -50,6 +50,8 @@ def main():
         pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
 
+        print(pd_all_tickers)
+
         # Mark tickers
         for index, row in pd_all_tickers.iterrows():
             for my_ticker in lst_dow_tickers:
@@ -73,6 +75,7 @@ def main():
 
         pd_all_tickers.to_sql('_yahoo_fin_tickers', con=conn_info, if_exists='replace')
         conn_info.close()
+        print("all done")
     except Exception as e:
         print(e)
 
