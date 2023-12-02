@@ -36,6 +36,11 @@ def main():
         pd_precious_metals_tickers = pd.DataFrame({"Ticker": lst_precious_metals_tickers})
         pd_precious_metals_tickers.set_index(['Ticker'])
 
+        # Oil
+        lst_oil_tickers = ["CL=F"]
+        pd_oil_tickers = pd.DataFrame({"Ticker": lst_oil_tickers})
+        pd_oil_tickers.set_index(['Ticker'])
+
         # Crypto
         lst_crypto_tickers = ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"]
         pd_crypto_tickers = pd.DataFrame({"Ticker": lst_crypto_tickers})
@@ -47,7 +52,7 @@ def main():
         # pd_other_tickers.set_index(['Ticker'])
 
         # Concat and remove duplicates
-        pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_crypto_tickers])
+        pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_oil_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
 
         print(pd_all_tickers)
@@ -69,6 +74,9 @@ def main():
             for my_ticker in lst_precious_metals_tickers:
                 if my_ticker == row['Ticker']:
                     pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
+            for my_ticker in lst_oil_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Oil"] = 1
             for my_ticker in lst_crypto_tickers:
                 if my_ticker == row['Ticker']:
                     pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Crypto"] = 1
