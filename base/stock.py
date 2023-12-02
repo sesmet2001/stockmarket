@@ -105,7 +105,11 @@ class Stock(Asset):
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             self.plotdata['Date2'] = self.plotdata['Date']
             self.plotdata.set_index('Date',inplace=True)
-            fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeStratReturn'].iloc[-1]))))
+            if self.plotdata['CumulativeStratReturn'].iloc[-1]:
+                fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeStratReturn'].iloc[-1]))))
+            else:
+                fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
+            
             fig.update_layout(width=1200, height=1600, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
             
