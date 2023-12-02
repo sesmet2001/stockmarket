@@ -87,14 +87,26 @@ class Stock(Asset):
     
     def getLastDate(self):
         return self.stockdata['Date'].iloc[-1]
-    
+
+    def calculate_returns(self,my_startcapital):
+        try: 
+            #self.stockdata['DailyReturns'].dropna()
+            #self.stockdata['Position'].dropna()
+            print(self.stockdata['ClosePercentChange'])
+            print(self.stockdata['Position'])
+            #my_return = self.stockdata.loc['ClosePercentChange'].dot(self.stockdata.loc['Position'])
+            #return my_return
+            return my_startcapital
+        except Exception as e:
+            print(e)
+
     def plotbasegraph(self,my_imagepath,my_plotrange,my_strategy):
         try:
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             self.plotdata['Date2'] = self.plotdata['Date']
             self.plotdata.set_index('Date',inplace=True)
-            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.05,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
-            fig.update_layout(width=1200, height=1200, title_x=0.5)
+            fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeStratReturn'].iloc[-1]))))
+            fig.update_layout(width=1200, height=1600, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
             
             # Row 1 Open Close
@@ -147,9 +159,29 @@ class Stock(Asset):
                 row=4, col=1
             )
 
+            # Row 5 Position
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['Position'],mode='lines',name='Position'),
+                row=5, col=1
+            )
+
+            # Row 6 Return
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['CumulativeStratReturn'],mode='lines',name='Return'),
+                row=6, col=1
+            )
+            
+            #f = pd.DataFrame()
+            #df["Color"] = np.where(self.plotdata['DailyReturn']<0, 'red', 'green')
+            #fig.add_trace(
+            #    go.Bar(x=self.plotdata.index,y=self.plotdata['DailyReturn'],name='Return'),
+            #    row=5, col=1
+            #)
+            #fig.update_traces(marker_color=df["Color"])
+
             # Add signals
-            #my_buy_signals = self.plotdata[self.plotdata[my_strategy] == "+"]
-            #my_sell_signals = self.plotdata[self.plotdata[my_strategy] == "-"]
+            #my_buy_signals = self.plotdata[self.plotdata["Buy"] > 1]
+            #my_sell_signals = self.plotdata[self.plotdata["Sell"] > 1]
             #for i,row in my_buy_signals.iterrows():
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
             #for i,row in my_sell_signals.iterrows():

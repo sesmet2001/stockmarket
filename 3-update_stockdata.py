@@ -14,33 +14,35 @@ import socket
 from patterns.cross import Cross
 import traceback
 import vectorbt as vbt
+from backtesting.lib import crossover
 
-def TEMA20_SMA50_crossover(prevTEMA20,TEMA20,prevSMA50,SMA50):
-    if prevTEMA20 < prevSMA50 and TEMA20 > SMA50:
-        return "bullish crossover"
-    elif prevTEMA20 > prevSMA50 and TEMA20 < SMA50:
-        return "bearish crossover"
-    else:
-        return None
+def cross_above_function(prev_val1,cur_val1,cur_val2):
+    try:
+        #print("prev_val1: " + str(prev_val1) + ", cur_val1: " + str(cur_val1) + ", cur_val2: " + str(cur_val2))
+        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(cur_val2)):
+            if prev_val1 < cur_val2 and cur_val1 > cur_val2:
+                return True
+            else:
+                return False       
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        line_number = exc_tb.tb_lineno
+        print(f"Exception occurred in cross on line {line_number}: {e}")
 
-def TEMA5_TEMA20_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20):
-    if prevTEMA5 < prevTEMA20 and TEMA5 > TEMA20:
-        return "bullish crossover"
-    elif prevTEMA5 > prevTEMA20 and TEMA5 < TEMA20:
-        return "bearish crossover"
-    else:
-        return None
-
-def TEMA5_TEMA20_RSI_crossover(prevTEMA5,TEMA5,prevTEMA20,TEMA20,prevRSI,RSI):
-    if ((TEMA5 > TEMA20 and prevTEMA5 < prevTEMA20) and (prevRSI < 30 and RSI > 30)):
-        return "bullish crossover"
-    elif ((TEMA5 < TEMA20 and prevTEMA5 > prevTEMA20) and (prevRSI > 70 and RSI < 70)):
-        return "bearish crossover"
-    else:
-        return None
+def cross_below_function(prev_val1,cur_val1,cur_val2):
+    try:
+        #print("prev_val1: " + str(prev_val1) + ", cur_val1: " + str(cur_val1) + ", cur_val2: " + str(cur_val2))
+        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(cur_val2)):
+            if prev_val1 > cur_val2 and cur_val1 < cur_val2:
+                return True
+            else:
+                return False     
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        line_number = exc_tb.tb_lineno
+        print(f"Exception occurred in cross on line {line_number}: {e}")
 
 def main():
-
     # PARAMETERS #
     chunksize = 100
     MACD_FAST = 12
@@ -49,7 +51,8 @@ def main():
     my_plotrange = 100
     my_strategy = "X_TEMA5_TEMA20"
     yf.pdr_override() 
-
+    cross_above = np.vectorize(cross_above_function)
+    cross_below = np.vectorize(cross_below_function)
     print(sys.path)
     
     # DB CONNECTIONS #
@@ -59,28 +62,11 @@ def main():
     conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur_info = conn_info.cursor()
 
-    # DEFINE START END #########
-    #sqlexists = """SELECT count(name) FROM sqlite_master WHERE type='table' AND name='CRM'"""
-    #cur_data.execute(sqlexists)
-    #if cur_data.fetchone()[0]==1:
-    #        print('Table exists.')
-    #        sqldates = """SELECT Date FROM CRM ORDER BY Date DESC LIMIT 1"""
-    #        my_start = cur_data.execute(sqldates).fetchone()
-    #        if socket.gethostname() == "aldix":
-    #            my_start = datetime.strptime(my_start[0], '%Y-%m-%d %H:%M:%S')
-    #        else:
-    #            my_start = datetime.strptime(my_start[0], '%Y-%m-%dT%H:%M:%S')
-    #        #my_start = datetime.strptime(my_start[0])
-    #        my_start = my_start.date() + timedelta(days=1)
-    #else:
-    #        my_start = datetime(2020, 1, 1)
-
-    my_start = datetime(2023, 1, 1)
+    my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
     print(my_end)
-
 
     # LOAD TICKER DATA #
     # test
@@ -141,14 +127,31 @@ def main():
                 my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
                 my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
                 my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
-                my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)
-                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], 1, 0)
-                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], 1, 0)
+                my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
+                my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
+                my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
+                my_stock.stockdata['RSI_X_ABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],30)
+                my_stock.stockdata['RSI_X_BELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],70)
+                #my_stock.stockdata['RSI_position'] = RSI_position(my_stock.stockdata['RSI_X_ABOVE_30'],my_stock.stockdata['RSI_X_BELOW_70'])
+                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata["TEMA5"],my_stock.stockdata["TEMA20"])
+                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata["TEMA5"],my_stock.stockdata["TEMA20"])
+                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata["MACD"],my_stock.stockdata["MACDSignal"])
+                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata["MACD"],my_stock.stockdata["MACDSignal"])
+                my_stock.stockdata['TEMA5_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], True, False)
+                my_stock.stockdata['TEMA20_ABOVE_SMA50'] = np.where(my_stock.stockdata['TEMA20'] > my_stock.stockdata['SMA50'], True, False)
+                my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
+                #my_stock.stockdata['curBuy'] = my_stock.stockdata['RSI_X_ABOVE_30'] + my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] #+ my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] 
+                #my_stock.stockdata['Buy'] = my_stock.stockdata['curBuy'].rolling(6, min_periods=1).sum()
+                #my_stock.stockdata['curSell'] = my_stock.stockdata['RSI_X_BELOW_70'] + my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] #+ my_stock.stockdata['MACD_X_BELOW_MACDSignal']
+                #my_stock.stockdata['Sell'] = my_stock.stockdata['curSell'].rolling(6, min_periods=1).sum()
+                #my_stock.stockdata['Buy'] = my_stock.stockdata[['RSI_X_ABOVE_30','TEMA5_X_ABOVE_TEMA20','MACD_X_ABOVE_MACDSignal']].all()
+                #my_stock.stockdata['Sell'] = my_stock.stockdata[['RSI_X_BELOW_70','TEMA5_X_BELOW_TEMA20','MACD_X_BELOW_MACDSignal']].all()
+                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], 1, 0)
+                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = crossover(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'])
                 #my_stock.stockdata['X_TEMA5_TEMA20'] = Cross(my_stock,"TEMA5","TEMA20").detect()
                 #my_stock.stockdata.dropna(inplace=True)
                 #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
                 #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
-                my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategy)
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
 
         except Exception as e:
