@@ -16,6 +16,8 @@ import traceback
 import vectorbt as vbt
 from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
+from strategies.TEMA_RSI2 import TEMA_RSI2
+from strategies.TEMA_RSI3 import TEMA_RSI3
 
 def cross_above_function(prev_val1,cur_val1,cur_val2):
     try:
@@ -83,17 +85,19 @@ def main():
         try:
             my_stock = Stock(conn_data,my_ticker,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
-                print(my_stock.ticker)         
-                my_stock.stockdata["Position"] = TEMA_RSI(my_stock).define_position()
+                print(my_stock.ticker)    
+                my_stock.stockdata["TEMA_RSI"] = TEMA_RSI(my_stock).define_position()
+                my_stock.stockdata["TEMA_RSI2"] = TEMA_RSI2(my_stock).define_position()    
+                my_stock.stockdata["TEMA_RSI3"] = TEMA_RSI3(my_stock).define_position()
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
 
         except Exception as e:
             # Get the exception information including the line number
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            
+                
             # Extract the line number
             line_number = exc_tb.tb_lineno
-            
+                
             # Print the exception message along with the line number
             print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
             continue

@@ -24,7 +24,7 @@ def main():
     MACD_SLOW = 26
     MACD_SIGNAL = 9
     my_plotrange = 100
-    my_strategy = "X_TEMA5_TEMA20"
+    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3"]
     my_starting_balance = 10000
     yf.pdr_override() 
     print(sys.path)
@@ -52,8 +52,11 @@ def main():
     my_tickers = [x[0] for x in my_tickers_list]
     #my_tickers = ["MSFT","NVDA"]
 
+    total_return = 0
+    total_stocks = 0
     for my_ticker in my_tickers:
         try:
+            total_stocks = total_stocks + 1
             my_stock = Stock(conn_data,my_ticker,my_end)
             my_stock.plotdata = my_stock.stockdata.tail(my_plotrange).copy()
             my_stock.plotdata['DailyReturn'] = my_stock.plotdata['Close'] / my_stock.plotdata['Open'] 
@@ -61,10 +64,13 @@ def main():
             my_stock.plotdata['CumulativeReturnPeak'] = my_stock.plotdata['CumulativeReturn'].cummax()
             my_stock.plotdata['Drawdown'] = my_stock.plotdata['CumulativeReturn'] - my_stock.plotdata['CumulativeReturnPeak']
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
-                my_stock.plotdata['StratReturn'] = np.where(my_stock.plotdata["Position"].shift(1)== True, my_stock.plotdata["DailyReturn"], 1.0) 
-                my_stock.plotdata['CumulativeStratReturn'] = my_starting_balance * my_stock.plotdata['StratReturn'].cumprod()
-                my_stock.plotdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
-                print(my_stock.ticker + ": " + str(my_stock.plotdata.CumulativeStratReturn.iloc[-1]))
+                for my_strategy in my_strategies:
+                    my_stock.plotdata[my_strategy + '_return'] = np.where(my_stock.plotdata[my_strategy].shift(1)== True, my_stock.plotdata["DailyReturn"], 1.0) 
+                    my_stock.plotdata[my_strategy + '_total_return'] = my_starting_balance * my_stock.plotdata[my_strategy + '_return'].cumprod()
+                    my_stock.plotdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
+                    print(my_stock.ticker + ": " + str(round(my_stock.plotdata[my_strategy + '_total_return'].iloc[-1])))
+                    total_return = total_return + my_stock.plotdata[my_strategy + '_total_return'].iloc[-1]
+            
 
         except Exception as e:
             # Get the exception information including the line number
@@ -76,6 +82,8 @@ def main():
             # Print the exception message along with the line number
             print(f"Exception occurred in backtest-returns on line {line_number}: {e}")
             continue
+
+    print("Total Return: " + str(round(total_return - (total_stocks * 10000))))
 
     cur_data.close()
     conn_data.close()

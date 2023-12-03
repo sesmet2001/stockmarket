@@ -24,7 +24,8 @@ def main():
     MACD_SLOW = 26
     MACD_SIGNAL = 9
     my_plotrange = 100
-    my_strategy = "X_TEMA5_TEMA20"
+    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3"]
+    my_colors = ["red","green","blue"]
     yf.pdr_override() 
     print(sys.path)
     
@@ -56,7 +57,7 @@ def main():
             my_stock = Stock(conn_data,my_ticker,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
                 print(my_stock.ticker)
-                my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategy)
+                my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategies,my_colors)
 
         except Exception as e:
             # Get the exception information including the line number

@@ -100,7 +100,7 @@ class Stock(Asset):
         except Exception as e:
             print(e)
 
-    def plotbasegraph(self,my_imagepath,my_plotrange,my_strategy):
+    def plotbasegraph(self,my_imagepath,my_plotrange,my_strategies,my_colors):
         try:
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             self.plotdata['Date2'] = self.plotdata['Date']
@@ -164,16 +164,23 @@ class Stock(Asset):
             )
 
             # Row 5 Position
-            fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['Position'],mode='lines',name='Position'),
-                row=5, col=1
-            )
+            colornbr = 0
+            for my_strategy in my_strategies:
+                fig.add_trace(
+                    go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
+                    row=5, col=1
+                )
+                colornbr = colornbr + 1
 
             # Row 6 Return
-            fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['CumulativeStratReturn'],mode='lines',name='Return'),
-                row=6, col=1
-            )
+            colornbr = 0
+            for my_strategy in my_strategies:
+                
+                fig.add_trace(
+                    go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
+                    row=6, col=1
+                )
+                colornbr = colornbr + 1
             
             #f = pd.DataFrame()
             #df["Color"] = np.where(self.plotdata['DailyReturn']<0, 'red', 'green')
