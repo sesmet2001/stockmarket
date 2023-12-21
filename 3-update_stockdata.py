@@ -16,11 +16,11 @@ import traceback
 import vectorbt as vbt
 from backtesting.lib import crossover
 
-def cross_above_function(prev_val1,cur_val1,cur_val2):
+def cross_above_function(prev_val1,cur_val1,prev_val2,cur_val2):
     try:
         #print("prev_val1: " + str(prev_val1) + ", cur_val1: " + str(cur_val1) + ", cur_val2: " + str(cur_val2))
-        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(cur_val2)):
-            if prev_val1 < cur_val2 and cur_val1 > cur_val2:
+        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(prev_val2) or np.isnan(cur_val2)):
+            if prev_val1 < prev_val2 and cur_val1 > cur_val2:
                 return True
             else:
                 return False       
@@ -29,11 +29,11 @@ def cross_above_function(prev_val1,cur_val1,cur_val2):
         line_number = exc_tb.tb_lineno
         print(f"Exception occurred in cross on line {line_number}: {e}")
 
-def cross_below_function(prev_val1,cur_val1,cur_val2):
+def cross_below_function(prev_val1,cur_val1,prev_val2,cur_val2):
     try:
         #print("prev_val1: " + str(prev_val1) + ", cur_val1: " + str(cur_val1) + ", cur_val2: " + str(cur_val2))
-        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(cur_val2)):
-            if prev_val1 > cur_val2 and cur_val1 < cur_val2:
+        if not (np.isnan(prev_val1) or np.isnan(cur_val1) or np.isnan(prev_val2) or np.isnan(cur_val2)):
+            if prev_val1 > prev_val2 and cur_val1 < cur_val2:
                 return True
             else:
                 return False     
@@ -62,7 +62,7 @@ def main():
     conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur_info = conn_info.cursor()
 
-    my_start = datetime(2020, 1, 1)
+    my_start = datetime(2017, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -130,16 +130,25 @@ def main():
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
                 my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
                 my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
-                my_stock.stockdata['RSI_X_ABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],30)
-                my_stock.stockdata['RSI_X_BELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],70)
+                my_stock.stockdata['RSI_X_ABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],30,30)
+                my_stock.stockdata['RSI_X_BELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],70,70)
                 #my_stock.stockdata['RSI_position'] = RSI_position(my_stock.stockdata['RSI_X_ABOVE_30'],my_stock.stockdata['RSI_X_BELOW_70'])
-                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata["TEMA5"],my_stock.stockdata["TEMA20"])
-                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata["TEMA5"],my_stock.stockdata["TEMA20"])
-                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata["MACD"],my_stock.stockdata["MACDSignal"])
-                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata["MACD"],my_stock.stockdata["MACDSignal"])
+                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                my_stock.stockdata['RSI_ABOVE_50'] = np.where(my_stock.stockdata['RSI'] > 50, True, False)
+                my_stock.stockdata['RSI_BELOW_50'] = np.where(my_stock.stockdata['RSI'] < 50, True, False)
+                my_stock.stockdata['RSI_ABOVE_70'] = np.where(my_stock.stockdata['RSI'] > 70, True, False)
+                my_stock.stockdata['RSI_BELOW_70'] = np.where(my_stock.stockdata['RSI'] < 70, True, False)
+                my_stock.stockdata['RSI_BELOW_30'] = np.where(my_stock.stockdata['RSI'] < 30, True, False)
+                my_stock.stockdata['RSI_ABOVE_30'] = np.where(my_stock.stockdata['RSI'] > 30, True, False)
                 my_stock.stockdata['TEMA5_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], True, False)
+                my_stock.stockdata['TEMA5_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], True, False)
                 my_stock.stockdata['TEMA20_ABOVE_SMA50'] = np.where(my_stock.stockdata['TEMA20'] > my_stock.stockdata['SMA50'], True, False)
+                my_stock.stockdata['TEMA20_BELOW_SMA50'] = np.where(my_stock.stockdata['TEMA20'] < my_stock.stockdata['SMA50'], True, False)
                 my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
+                my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
                 #my_stock.stockdata['curBuy'] = my_stock.stockdata['RSI_X_ABOVE_30'] + my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] #+ my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] 
                 #my_stock.stockdata['Buy'] = my_stock.stockdata['curBuy'].rolling(6, min_periods=1).sum()
                 #my_stock.stockdata['curSell'] = my_stock.stockdata['RSI_X_BELOW_70'] + my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] #+ my_stock.stockdata['MACD_X_BELOW_MACDSignal']

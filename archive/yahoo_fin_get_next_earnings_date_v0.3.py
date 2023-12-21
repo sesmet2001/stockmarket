@@ -11,11 +11,11 @@ def main():
     conn = sqlite3.connect(DB_PATH + "/stockradar.db")
     cur = conn.cursor()
         
-    sqlsymbols = """SELECT Symbol FROM _symbols_euronext UNION SELECT Symbol FROM _symbols_nasdaq UNION SELECT Symbol FROM _symbols_sp500 LIMIT 5"""
+    #sqlsymbols = """SELECT Symbol FROM _symbols_euronext UNION SELECT Symbol FROM _symbols_nasdaq UNION SELECT Symbol FROM _symbols_sp500 LIMIT 5"""
 
-    tickers = cur.execute(sqlsymbols).fetchall()
-    tickers = [x[0] for x in tickers]
-    
+    #tickers = cur.execute(sqlsymbols).fetchall()
+    #tickers = [x[0] for x in tickers]
+    tickers = ['AAPL','GOOG']
     for ticker in tickers:
         print(ticker)
         try:

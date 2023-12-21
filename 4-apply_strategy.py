@@ -18,6 +18,7 @@ from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
 from strategies.TEMA_RSI2 import TEMA_RSI2
 from strategies.TEMA_RSI3 import TEMA_RSI3
+import warnings
 
 def cross_above_function(prev_val1,cur_val1,cur_val2):
     try:
@@ -46,17 +47,17 @@ def cross_below_function(prev_val1,cur_val1,cur_val2):
         print(f"Exception occurred in cross on line {line_number}: {e}")
 
 def main():
+    warnings.filterwarnings("ignore")
     # PARAMETERS #
     chunksize = 100
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
     my_plotrange = 100
-    my_strategy = "X_TEMA5_TEMA20"
     yf.pdr_override() 
     cross_above = np.vectorize(cross_above_function)
     cross_below = np.vectorize(cross_below_function)
-    print(sys.path)
+    #print(sys.path)
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')

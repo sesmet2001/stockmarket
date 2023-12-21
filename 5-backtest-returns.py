@@ -27,7 +27,7 @@ def main():
     my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3"]
     my_starting_balance = 10000
     yf.pdr_override() 
-    print(sys.path)
+    #print(sys.path)
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -52,7 +52,7 @@ def main():
     my_tickers = [x[0] for x in my_tickers_list]
     #my_tickers = ["MSFT","NVDA"]
 
-    total_return = 0
+
     total_stocks = 0
     for my_ticker in my_tickers:
         try:
@@ -69,7 +69,6 @@ def main():
                     my_stock.plotdata[my_strategy + '_total_return'] = my_starting_balance * my_stock.plotdata[my_strategy + '_return'].cumprod()
                     my_stock.plotdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
                     print(my_stock.ticker + ": " + str(round(my_stock.plotdata[my_strategy + '_total_return'].iloc[-1])))
-                    total_return = total_return + my_stock.plotdata[my_strategy + '_total_return'].iloc[-1]
             
 
         except Exception as e:
@@ -83,7 +82,18 @@ def main():
             print(f"Exception occurred in backtest-returns on line {line_number}: {e}")
             continue
 
-    print("Total Return: " + str(round(total_return - (total_stocks * 10000))))
+    for my_strategy in my_strategies:
+        total_stocks = 0
+        total_return = 0
+        for my_ticker in my_tickers:
+            total_stocks = total_stocks + 1
+            my_stock = Stock(conn_data,my_ticker,my_end)
+            my_stock.plotdata = my_stock.stockdata.tail(my_plotrange).copy()
+            total_return = total_return + my_stock.plotdata[my_strategy + '_total_return'].iloc[-1]
+        my_return = round(total_return - (10000*total_stocks))
+        my_investment = round(10000*total_stocks)
+        my_pct_return = (total_return - (10000*total_stocks))/total_return*100
+        print("Total Return " + my_strategy + ": " + str(my_return) + "$ on investment of " + str(my_investment) + "$ (" + str(round(my_pct_return,2)) + "%)")
 
     cur_data.close()
     conn_data.close()

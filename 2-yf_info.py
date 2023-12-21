@@ -71,7 +71,7 @@ def main():
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur = conn.cursor()
  
-    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers"""
+    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers LIMIT 5"""
     cur.execute(my_tickers)
     tickers = cur.fetchall()
     tickers = [x[0] for x in tickers]

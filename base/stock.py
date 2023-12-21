@@ -14,10 +14,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 class Stock(Asset):
-    def __init__(self, my_conn, my_ticker, my_enddate):
+    def __init__(self, my_conn, my_ticker, my_startdate, my_enddate):
         self.type = "stock"
         self.ticker = my_ticker
-        self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date <= '" + str(my_enddate) + "'",my_conn)
+        self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'",my_conn)
 
     def dropna(self):
         self.stockdata.dropna(subset=['Close'], inplace=True)
@@ -105,10 +105,11 @@ class Stock(Asset):
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             self.plotdata['Date2'] = self.plotdata['Date']
             self.plotdata.set_index('Date',inplace=True)
-            if self.plotdata['CumulativeStratReturn'].iloc[-1]:
-                fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeStratReturn'].iloc[-1]))))
-            else:
-                fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
+            #if self.plotdata['CumulativeReturn'].iloc[-1]:
+            #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
+            #else:
+            #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
+            fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
             
             fig.update_layout(width=1200, height=1600, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
@@ -128,6 +129,18 @@ class Stock(Asset):
             )
             fig.add_trace(
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['TEMA20'],mode='lines',name='TEMA20'),
+                row=1, col=1
+            )
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_up'],mode='lines',name='BB upper'),
+                row=1, col=1
+            )
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_mid'],mode='lines',name='BB middle'),
+                row=1, col=1
+            )
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower'),
                 row=1, col=1
             )
             #fig.add_trace(
@@ -164,6 +177,7 @@ class Stock(Asset):
             )
 
             # Row 5 Position
+            my_strategies = ["TEMA_RSI3"]
             colornbr = 0
             for my_strategy in my_strategies:
                 fig.add_trace(
@@ -174,8 +188,8 @@ class Stock(Asset):
 
             # Row 6 Return
             colornbr = 0
-            for my_strategy in my_strategies:
-                
+            my_strategies = ["TEMA_RSI3"]
+            for my_strategy in my_strategies:                
                 fig.add_trace(
                     go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
                     row=6, col=1
@@ -191,12 +205,12 @@ class Stock(Asset):
             #fig.update_traces(marker_color=df["Color"])
 
             # Add signals
-            #my_buy_signals = self.plotdata[self.plotdata["Buy"] > 1]
-            #my_sell_signals = self.plotdata[self.plotdata["Sell"] > 1]
-            #for i,row in my_buy_signals.iterrows():
-            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
-            #for i,row in my_sell_signals.iterrows():
-            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
+            TEMA5_X_ABOVE_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_ABOVE_TEMA20"] == 1]
+            TEMA5_X_BELOW_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_BELOW_TEMA20"] == 1]
+            for i,row in TEMA5_X_ABOVE_TEMA20.iterrows():
+                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
+            for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
+                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
 
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido") 
             return 1
