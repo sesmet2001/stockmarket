@@ -132,15 +132,15 @@ class Stock(Asset):
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_up'],mode='lines',name='BB upper',line_color='grey'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_up'],mode='lines',name='BB upper',line_color='grey',opacity=50),
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_mid'],mode='lines',name='BB middle',line_color='grey'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_mid'],mode='lines',name='BB middle',line_color='grey',opacity=50),
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey',opacity=50),
                 row=1, col=1
             )
             #fig.add_trace(
