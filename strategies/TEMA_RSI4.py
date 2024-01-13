@@ -16,11 +16,15 @@ class TEMA_RSI4(Stock):
                 prev1_row = row
             elif loopcount == 1:
                 prev2_row = prev1_row
+            elif loopcount == 2:
+                prev3_row = prev2_row
+            elif loopcount == 3:
+                prev4_row = prev3_row
             else:
                 # Enter a position
-                if(((row['RSI_X_ABOVE_30']==1) or prev1_row['RSI_X_ABOVE_30']==1 or prev2_row['RSI_X_ABOVE_30']==1) and \
-                   ((row['TEMA5_X_ABOVE_TEMA20']==1) or prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1) and \
-                   ((row['MACD_X_ABOVE_MACDSignal']==1) or prev1_row['MACD_X_ABOVE_MACDSignal']==1 or prev2_row['MACD_X_ABOVE_MACDSignal']==1) and \
+                if((row['RSI_X_ABOVE_30']==1 or prev1_row['RSI_X_ABOVE_30']==1 or prev2_row['RSI_X_ABOVE_30']==1 or prev3_row['RSI_X_ABOVE_30']==1 or prev4_row['RSI_X_ABOVE_30']==1) and \
+                   (row['TEMA5_X_ABOVE_TEMA20']==1 or prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1 or prev3_row['TEMA5_X_ABOVE_TEMA20']==1 or prev4_row['TEMA5_X_ABOVE_TEMA20']==1) and \
+                   (row['MACD_X_ABOVE_MACDSignal']==1 or prev1_row['MACD_X_ABOVE_MACDSignal']==1 or prev2_row['MACD_X_ABOVE_MACDSignal']==1 or prev3_row['MACD_X_ABOVE_MACDSignal']==1 or prev4_row['MACD_X_ABOVE_MACDSignal']==1) and \
                     self.position == 0):                
                 #if ((row['TEMA5_X_ABOVE_TEMA20']==1 or row['RSI_X_ABOVE_30']==1 or row['MACD_X_ABOVE_MACDSignal']==1) 
                 #    and row['TEMA20_ABOVE_SMA50'] and row['RSI_ABOVE_30'] and row['MACD_ABOVE_MACDSignal'] and self.position == 0):
@@ -30,9 +34,9 @@ class TEMA_RSI4(Stock):
                         self.position = 1
 
                 # Exit a position
-                if(((row['RSI_X_BELOW_70']==1) or prev1_row['RSI_X_BELOW_70']==1 or prev2_row['RSI_X_BELOW_70']==1) and \
-                   ((row['TEMA5_X_BELOW_TEMA20']==1) or prev1_row['TEMA5_X_BELOW_TEMA20']==1 or prev2_row['TEMA5_X_BELOW_TEMA20']==1) and \
-                   ((row['MACD_X_BELOW_MACDSignal']==1) or prev1_row['MACD_X_BELOW_MACDSignal']==1 or prev2_row['MACD_X_BELOW_MACDSignal']==1) and \
+                if((row['RSI_X_BELOW_70']==1 or prev1_row['RSI_X_BELOW_70']==1 or prev2_row['RSI_X_BELOW_70']==1 or prev3_row['RSI_X_BELOW_70']==1 or prev4_row['RSI_X_BELOW_70']==1) and \
+                   (row['TEMA5_X_BELOW_TEMA20']==1 or prev1_row['TEMA5_X_BELOW_TEMA20']==1 or prev2_row['TEMA5_X_BELOW_TEMA20']==1 or prev3_row['RSI_X_BELOW_70']==1 or prev4_row['RSI_X_BELOW_70']==1) and \
+                   (row['MACD_X_BELOW_MACDSignal']==1 or prev1_row['MACD_X_BELOW_MACDSignal']==1 or prev2_row['MACD_X_BELOW_MACDSignal']==1 or prev3_row['RSI_X_BELOW_70']==1 or prev4_row['RSI_X_BELOW_70']==1) and \
                     self.position == 1):           
                 #elif ((row['TEMA5_X_BELOW_TEMA20']==1 or row['RSI_X_BELOW_70']==1 or row['MACD_X_BELOW_MACDSignal']==1 or row['TEMA20_BELOW_SMA50'] or row['RSI_BELOW_70'] or row['MACD_BELOW_MACDSignal']) and self.position == 1):
                     if pd.notna(pd.Series([0]).any()):
@@ -43,6 +47,8 @@ class TEMA_RSI4(Stock):
                 else:
                     if pd.notna(pd.Series([self.position]).any()):
                         final_position = pd.concat([final_position,pd.Series([self.position])], ignore_index=True)
+                prev4_row = prev3_row
+                prev3_row = prev2_row
                 prev2_row = prev1_row
                 prev1_row = row
                 
