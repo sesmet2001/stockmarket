@@ -18,6 +18,7 @@ from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
 from strategies.TEMA_RSI2 import TEMA_RSI2
 from strategies.TEMA_RSI3 import TEMA_RSI3
+from strategies.TEMA_RSI4 import TEMA_RSI4
 import warnings
 
 def cross_above_function(prev_val1,cur_val1,cur_val2):
@@ -90,6 +91,7 @@ def main():
                 my_stock.stockdata["TEMA_RSI"] = TEMA_RSI(my_stock).define_position()
                 my_stock.stockdata["TEMA_RSI2"] = TEMA_RSI2(my_stock).define_position()    
                 my_stock.stockdata["TEMA_RSI3"] = TEMA_RSI3(my_stock).define_position()
+                my_stock.stockdata["TEMA_RSI4"] = TEMA_RSI4(my_stock).define_position()
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
 
         except Exception as e:
