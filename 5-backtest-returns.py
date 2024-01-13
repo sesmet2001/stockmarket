@@ -57,7 +57,7 @@ def main():
     for my_ticker in my_tickers:
         try:
             total_stocks = total_stocks + 1
-            my_stock = Stock(conn_data,my_ticker,my_end)
+            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             my_stock.plotdata = my_stock.stockdata.tail(my_plotrange).copy()
             my_stock.plotdata['DailyReturn'] = my_stock.plotdata['Close'] / my_stock.plotdata['Open'] 
             my_stock.plotdata['CumulativeReturn'] = my_stock.plotdata['DailyReturn'].cumprod()
@@ -87,7 +87,7 @@ def main():
         total_return = 0
         for my_ticker in my_tickers:
             total_stocks = total_stocks + 1
-            my_stock = Stock(conn_data,my_ticker,my_end)
+            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             my_stock.plotdata = my_stock.stockdata.tail(my_plotrange).copy()
             total_return = total_return + my_stock.plotdata[my_strategy + '_total_return'].iloc[-1]
         my_return = round(total_return - (10000*total_stocks))

@@ -54,7 +54,7 @@ def main():
 
     for my_ticker in my_tickers:
         try:
-            my_stock = Stock(conn_data,my_ticker,my_end)
+            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
                 print(my_stock.ticker)
                 my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategies,my_colors)
