@@ -132,15 +132,15 @@ class Stock(Asset):
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_up'],mode='lines',name='BB upper'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_up'],mode='lines',name='BB upper',fillcolor='grey'),
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_mid'],mode='lines',name='BB middle'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_mid'],mode='lines',name='BB middle',fillcolor='grey'),
                 row=1, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',fillcolor='grey'),
                 row=1, col=1
             )
             #fig.add_trace(
@@ -207,10 +207,10 @@ class Stock(Asset):
             # Add signals
             TEMA5_X_ABOVE_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_ABOVE_TEMA20"] == 1]
             TEMA5_X_BELOW_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_BELOW_TEMA20"] == 1]
-            for i,row in TEMA5_X_ABOVE_TEMA20.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
-            for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
-                fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
+            #for i,row in TEMA5_X_ABOVE_TEMA20.iterrows():
+            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
+            #for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
+            #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
 
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido") 
             return 1
