@@ -24,7 +24,7 @@ def main():
     MACD_SLOW = 26
     MACD_SIGNAL = 9
     my_plotrange = 100
-    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3","TEMA_RSI4"]
+    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3","TEMA_RSI4","TEMA_RSI5"]
     my_starting_balance = 10000
     yf.pdr_override() 
     #print(sys.path)

@@ -3,7 +3,7 @@ from base.stock import Stock
 import numpy as np
 import pandas as pd 
 
-class TEMA_RSI4(Stock):
+class TEMA_RSI5(Stock):
     def __init__(self, my_stock):
         self.stock = my_stock
         self.position = 0
@@ -22,9 +22,9 @@ class TEMA_RSI4(Stock):
                 prev4_row = prev3_row
             else:
                 # Enter a position
-                if((row['RSI_X_ABOVE_30']==1 or prev1_row['RSI_X_ABOVE_30']==1 or prev2_row['RSI_X_ABOVE_30']==1) and \
-                   (row['TEMA5_X_ABOVE_TEMA20']==1 or prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1) and \
-                   (row['MACD_X_ABOVE_MACDSignal']==1 or prev1_row['MACD_X_ABOVE_MACDSignal']==1 or prev2_row['MACD_X_ABOVE_MACDSignal']==1) and \
+                if((row['RSI_X_ABOVE_30']==1 or prev1_row['RSI_X_ABOVE_30']==1 or prev2_row['RSI_X_ABOVE_30']==1 or prev3_row['RSI_X_ABOVE_30']==1) and \
+                   (row['TEMA5_X_ABOVE_TEMA20']==1 or prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1 or prev3_row['TEMA5_X_ABOVE_TEMA20']==1) and \
+                   (row['MACD_X_ABOVE_MACDSignal']==1 or prev1_row['MACD_X_ABOVE_MACDSignal']==1 or prev2_row['MACD_X_ABOVE_MACDSignal']==1 or prev3_row['MACD_X_ABOVE_MACDSignal']==1) and \
                     self.position == 0):                
                 #if ((row['TEMA5_X_ABOVE_TEMA20']==1 or row['RSI_X_ABOVE_30']==1 or row['MACD_X_ABOVE_MACDSignal']==1) 
                 #    and row['TEMA20_ABOVE_SMA50'] and row['RSI_ABOVE_30'] and row['MACD_ABOVE_MACDSignal'] and self.position == 0):
@@ -34,9 +34,9 @@ class TEMA_RSI4(Stock):
                         self.position = 1
 
                 # Exit a position
-                if((row['RSI_X_BELOW_70']==1 or prev1_row['RSI_X_BELOW_70']==1 or prev2_row['RSI_X_BELOW_70']==1) and \
-                   (row['TEMA5_X_BELOW_TEMA20']==1 or prev1_row['TEMA5_X_BELOW_TEMA20']==1 or prev2_row['TEMA5_X_BELOW_TEMA20']==1) and \
-                   (row['MACD_X_BELOW_MACDSignal']==1 or prev1_row['MACD_X_BELOW_MACDSignal']==1 or prev2_row['MACD_X_BELOW_MACDSignal']==1) and \
+                if((row['RSI_X_BELOW_70']==1 or prev1_row['RSI_X_BELOW_70']==1 or prev2_row['RSI_X_BELOW_70']==1 or prev3_row['RSI_X_BELOW_70']==1) and \
+                   (row['TEMA5_X_BELOW_TEMA20']==1 or prev1_row['TEMA5_X_BELOW_TEMA20']==1 or prev2_row['TEMA5_X_BELOW_TEMA20']==1 or prev3_row['RSI_X_BELOW_70']==1) and \
+                   (row['MACD_X_BELOW_MACDSignal']==1 or prev1_row['MACD_X_BELOW_MACDSignal']==1 or prev2_row['MACD_X_BELOW_MACDSignal']==1 or prev3_row['RSI_X_BELOW_70']==1) and \
                     self.position == 1):           
                 #elif ((row['TEMA5_X_BELOW_TEMA20']==1 or row['RSI_X_BELOW_70']==1 or row['MACD_X_BELOW_MACDSignal']==1 or row['TEMA20_BELOW_SMA50'] or row['RSI_BELOW_70'] or row['MACD_BELOW_MACDSignal']) and self.position == 1):
                     if pd.notna(pd.Series([0]).any()):
