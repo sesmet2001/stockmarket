@@ -43,6 +43,8 @@ class TEMA_RSI4(Stock):
                 else:
                     if pd.notna(pd.Series([self.position]).any()):
                         final_position = pd.concat([final_position,pd.Series([self.position])], ignore_index=True)
+                prev2_row = prev1_row
+                prev1_row = row
                 
             loopcount = loopcount + 1
         return final_position
