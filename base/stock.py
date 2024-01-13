@@ -177,7 +177,7 @@ class Stock(Asset):
             )
 
             # Row 5 Position
-            my_strategies = ["TEMA_RSI3"]
+            my_strategies = ["TEMA_RSI2"]
             colornbr = 0
             for my_strategy in my_strategies:
                 fig.add_trace(
@@ -188,7 +188,7 @@ class Stock(Asset):
 
             # Row 6 Return
             colornbr = 0
-            my_strategies = ["TEMA_RSI3"]
+            my_strategies = ["TEMA_RSI2"]
             for my_strategy in my_strategies:                
                 fig.add_trace(
                     go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
