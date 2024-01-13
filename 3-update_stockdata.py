@@ -62,7 +62,7 @@ def main():
     conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur_info = conn_info.cursor()
 
-    my_start = datetime(2017, 1, 1)
+    my_start = datetime(2016, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -71,7 +71,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 AND Ticker != 'ARM' OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
@@ -105,7 +105,7 @@ def main():
     
     for my_ticker in my_tickers:
         try:
-            my_stock = Stock(conn_data,my_ticker,my_end)
+            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
                 print(my_stock.ticker)
                 my_stock.dropna()
