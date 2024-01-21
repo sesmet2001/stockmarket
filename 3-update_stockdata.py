@@ -120,13 +120,13 @@ def main():
                 #
                 #my_stock.stockdata['stoploss'] = my_stoplosses
                 if len(my_stoplosses_pd) > 0:
-                    print(my_stoplosses_pd)
-                    print(my_stock.stockdata.head(10))
-                    print("stoploss " + my_stock.ticker)
+                    #print(my_stoplosses_pd)
+                    #print(my_stock.stockdata.head(10))
+                    #print("stoploss " + my_stock.ticker)
                     my_stock.stockdata = my_stock.stockdata.join(my_stoplosses_pd["SL_Price"], how='left')
                 else:
                     my_stock.stockdata["SL_Price"] = np.nan
-                print(my_stock.stockdata["SL_Price"].tail(10))
+                #print(my_stock.stockdata["SL_Price"].tail(10))
                 my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
                 my_stock.stockdata["SMA10"] = ta.SMA(my_stock.stockdata['Close'],10)
                 my_stock.stockdata["SMA50"] = ta.SMA(my_stock.stockdata['Close'],50)
