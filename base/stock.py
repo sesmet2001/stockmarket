@@ -18,6 +18,8 @@ class Stock(Asset):
         self.type = "stock"
         self.ticker = my_ticker
         self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'",my_conn)
+        self.stockdata.set_index("Date",inplace=True)
+        #print(self.stockdata.head(10))
 
     def dropna(self):
         self.stockdata.dropna(subset=['Close'], inplace=True)
@@ -103,8 +105,8 @@ class Stock(Asset):
     def plotbasegraph(self,my_imagepath,my_plotrange,my_strategies,my_colors):
         try:
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
-            self.plotdata['Date2'] = self.plotdata['Date']
-            self.plotdata.set_index('Date',inplace=True)
+            #self.plotdata['Date2'] = self.plotdata['Date']
+            #self.plotdata.set_index('Date',inplace=True)
             #if self.plotdata['CumulativeReturn'].iloc[-1]:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
@@ -141,6 +143,10 @@ class Stock(Asset):
             )
             fig.add_trace(
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey',opacity=0.2),
+                row=1, col=1
+            )
+            fig.add_trace(
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['SL_Price'],mode='markers',name='Stop Loss',line_color='red',opacity=1),
                 row=1, col=1
             )
             #fig.add_trace(

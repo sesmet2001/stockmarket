@@ -9,17 +9,18 @@ class TEMA_RSI2(Stock):
         self.position = 0
 
     def define_position(self):
-        final_position = pd.Series()
+        position_df = pd.DataFrame(columns=["TEMA_RSI2"])
+        position_df.index.name = "Date"
         for index, row in self.stock.stockdata.iterrows():
             if row['TEMA5_X_ABOVE_TEMA20']==1 and self.position == 0:
                 if pd.notna(pd.Series([1]).any()):
-                    final_position = pd.concat([final_position,pd.Series([1])], ignore_index=True)
+                    position_df.loc[index, 'TEMA_RSI2'] = 1
                     self.position = 1
             elif row['TEMA5_X_BELOW_TEMA20']==1 and self.position == 1:
                 if pd.notna(pd.Series([0]).any()):
-                    final_position = pd.concat([final_position,pd.Series([0])], ignore_index=True)
+                    position_df.loc[index, 'TEMA_RSI2'] = 0
                     self.position = 0
             else:
                 if pd.notna(pd.Series([self.position]).any()):
-                    final_position = pd.concat([final_position,pd.Series([self.position])], ignore_index=True)
-        return final_position
+                    position_df.loc[index, 'TEMA_RSI2'] = self.position
+        return position_df

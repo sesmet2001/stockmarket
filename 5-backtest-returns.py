@@ -24,7 +24,7 @@ def main():
     MACD_SLOW = 26
     MACD_SIGNAL = 9
     my_plotrange = 100
-    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3","TEMA_RSI4","TEMA_RSI5"]
+    my_strategies = ["TEMA_RSI","TEMA_RSI2","TEMA_RSI3","TEMA_RSI4"] #,"TEMA_RSI5"]
     my_starting_balance = 10000
     yf.pdr_override() 
     #print(sys.path)
@@ -45,7 +45,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
@@ -63,11 +63,11 @@ def main():
             my_stock.plotdata['CumulativeReturn'] = my_stock.plotdata['DailyReturn'].cumprod()
             my_stock.plotdata['CumulativeReturnPeak'] = my_stock.plotdata['CumulativeReturn'].cummax()
             my_stock.plotdata['Drawdown'] = my_stock.plotdata['CumulativeReturn'] - my_stock.plotdata['CumulativeReturnPeak']
-            if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
+            if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 for my_strategy in my_strategies:
                     my_stock.plotdata[my_strategy + '_return'] = np.where(my_stock.plotdata[my_strategy].shift(1)== True, my_stock.plotdata["DailyReturn"], 1.0) 
                     my_stock.plotdata[my_strategy + '_total_return'] = my_starting_balance * my_stock.plotdata[my_strategy + '_return'].cumprod()
-                    my_stock.plotdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
+                    my_stock.plotdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
                     print(my_stock.ticker + ": " + str(round(my_stock.plotdata[my_strategy + '_total_return'].iloc[-1])))
             
 

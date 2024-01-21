@@ -60,6 +60,7 @@ def main():
     cross_above = np.vectorize(cross_above_function)
     cross_below = np.vectorize(cross_below_function)
     #print(sys.path)
+    pd.set_option('display.max_rows', None)
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -68,7 +69,7 @@ def main():
     conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
     cur_info = conn_info.cursor()
 
-    my_start = datetime(2020, 1, 1)
+    my_start = datetime(2016, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -77,7 +78,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
@@ -87,14 +88,14 @@ def main():
     for my_ticker in my_tickers:
         try:
             my_stock = Stock(conn_data,my_ticker,my_start,my_end)
-            if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
-                print(my_stock.ticker)    
+            if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
+                print(my_stock.ticker)
                 my_stock.stockdata["TEMA_RSI"] = TEMA_RSI(my_stock).define_position()
                 my_stock.stockdata["TEMA_RSI2"] = TEMA_RSI2(my_stock).define_position()    
                 my_stock.stockdata["TEMA_RSI3"] = TEMA_RSI3(my_stock).define_position()
                 my_stock.stockdata["TEMA_RSI4"] = TEMA_RSI4(my_stock).define_position()
-                my_stock.stockdata["TEMA_RSI5"] = TEMA_RSI5(my_stock).define_position()
-                my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
+                #my_stock.stockdata["TEMA_RSI5"] = TEMA_RSI5(my_stock).define_position()
+                my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True) 
 
         except Exception as e:
             # Get the exception information including the line number
@@ -104,7 +105,7 @@ def main():
             line_number = exc_tb.tb_lineno
                 
             # Print the exception message along with the line number
-            print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
+            print(f"Exception occurred in apply-strategy on line {line_number}: {e}")
             continue
 
     cur_data.close()

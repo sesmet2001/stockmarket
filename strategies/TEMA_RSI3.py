@@ -9,22 +9,23 @@ class TEMA_RSI3(Stock):
         self.position = 0
 
     def define_position(self):
-        final_position = pd.Series()
+        position_df = pd.DataFrame(columns=["TEMA_RSI3"])
+        position_df.index.name = "Date"
         for index, row in self.stock.stockdata.iterrows():
             # Enter a position
             if ((row['TEMA5_X_ABOVE_TEMA20']==1 or row['RSI_X_ABOVE_30']==1 or row['MACD_X_ABOVE_MACDSignal']==1) and row['TEMA20_ABOVE_SMA50'] and row['RSI_ABOVE_30'] and row['MACD_ABOVE_MACDSignal'] and self.position == 0):
                 if pd.notna(pd.Series([1]).any()):
                     #print(row['Date'] + " - Entering: (TEMA5_X_ABOVE_TEMA20=" + str(row['TEMA5_X_ABOVE_TEMA20']) + " or RSI_X_ABOVE_30=" + str(row['RSI_X_ABOVE_30']) + " or MACD_X_ABOVE_MACDSignal=" + str(row['MACD_X_ABOVE_MACDSignal']) + ") and TEMA20_ABOVE_SMA50=" + str(row['TEMA20_ABOVE_SMA50']) + " and RSI_ABOVE_50=" + str(row['RSI_ABOVE_50']) + " and MACD_ABOVE_MACDSignal=" + str(row['MACD_ABOVE_MACDSignal']) + ")")
-                    final_position = pd.concat([final_position,pd.Series([1])], ignore_index=True)
+                    position_df.loc[index, 'TEMA_RSI3'] = 1
                     self.position = 1
             # Exit a position
             elif ((row['TEMA5_X_BELOW_TEMA20']==1 or row['RSI_X_BELOW_70']==1 or row['MACD_X_BELOW_MACDSignal']==1 or row['TEMA20_BELOW_SMA50'] or row['RSI_BELOW_70'] or row['MACD_BELOW_MACDSignal']) and self.position == 1):
                 if pd.notna(pd.Series([0]).any()):
                     #print(row['Date'] + " - Exiting: (TEMA5_X_BELOW_TEMA20=" + str(row['TEMA5_X_BELOW_TEMA20']) + " or RSI_X_BELOW_70=" + str(row['RSI_X_BELOW_70']) + " or MACD_X_BELOW_MACDSignal=" + str(row['MACD_X_BELOW_MACDSignal']) + ") and TEMA20_BELOW_SMA50=" + str(row['TEMA20_BELOW_SMA50']) + " and RSI_BELOW_50=" + str(row['RSI_BELOW_50']) + " and MACD_BELOW_MACDSignal=" + str(row['MACD_BELOW_MACDSignal']) + ")")
-                    final_position = pd.concat([final_position,pd.Series([0])], ignore_index=True)
+                    position_df.loc[index, 'TEMA_RSI3'] = 0
                     self.position = 0
             # Keep a position
             else:
                 if pd.notna(pd.Series([self.position]).any()):
-                    final_position = pd.concat([final_position,pd.Series([self.position])], ignore_index=True)
-        return final_position
+                    position_df.loc[index, 'TEMA_RSI3'] = self.position
+        return position_df

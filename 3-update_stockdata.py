@@ -54,6 +54,7 @@ def main():
     cross_above = np.vectorize(cross_above_function)
     cross_below = np.vectorize(cross_below_function)
     print(sys.path)
+    pd.set_option('display.max_rows', None)
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -71,12 +72,16 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
     #my_tickers = ["MSFT","NVDA"]
+
+    # LOAD TRANSACTIONS
+    stoploss_pd = pd.read_csv("stoploss.txt")
+    stoploss_pd.set_index("SL_Date",inplace=True)
 
     # DOWNLOAD DATA IN CHUNKS #
     chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
@@ -106,9 +111,17 @@ def main():
     for my_ticker in my_tickers:
         try:
             my_stock = Stock(conn_data,my_ticker,my_start,my_end)
-            if type(my_stock.stockdata["AdjClose"].iloc[0:1][0]) == np.float64:
+            if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
                 my_stock.dropna()
+                my_stoplosses_pd = stoploss_pd[stoploss_pd["SL_Ticker"] == my_stock.ticker]
+                #if 
+                #
+                #my_stock.stockdata['stoploss'] = my_stoplosses
+                if len(my_stoplosses_pd) > 0:
+                    my_stock.stockdata = my_stock.stockdata.join(my_stoplosses_pd["SL_Price"], how='left')
+                else:
+                    my_stock.stockdata["SL_Price"] = np.nan
                 my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
                 my_stock.stockdata["SMA10"] = ta.SMA(my_stock.stockdata['Close'],10)
                 my_stock.stockdata["SMA50"] = ta.SMA(my_stock.stockdata['Close'],50)
@@ -161,7 +174,7 @@ def main():
                 #my_stock.stockdata.dropna(inplace=True)
                 #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
                 #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
-                my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = False)
+                my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
 
         except Exception as e:
             # Get the exception information including the line number
