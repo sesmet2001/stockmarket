@@ -80,7 +80,12 @@ def main():
     #my_tickers = ["MSFT","NVDA"]
 
     # LOAD TRANSACTIONS
-    stoploss_pd = pd.read_csv("stoploss.txt")
+    if os.name == 'nt':
+        print(os.name)
+        stoploss_pd = pd.read_csv("stoploss-win.txt")
+    else:
+        print(os.name)
+        stoploss_pd = pd.read_csv("stoploss.txt")
     stoploss_pd.set_index("SL_Date",inplace=True)
 
     # DOWNLOAD DATA IN CHUNKS #
@@ -179,6 +184,7 @@ def main():
                 #my_stock.stockdata.dropna(inplace=True)
                 #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
                 #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
+                #print(my_stock.stockdata["SL_Price"].tail(10))
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
 
         except Exception as e:
