@@ -141,6 +141,7 @@ def main():
                 my_stock.stockdata["TEMA10"] = ta.TEMA(my_stock.stockdata['Close'],10)
                 my_stock.stockdata["TEMA20"] = ta.TEMA(my_stock.stockdata['Close'],20)
                 my_stock.stockdata["TEMA50"] = ta.TEMA(my_stock.stockdata['Close'],50)
+                my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
                 my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=6)
                 my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
                 my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()

@@ -111,7 +111,7 @@ class Stock(Asset):
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
-            fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
+            fig = make_subplots(rows=7,cols=1,vertical_spacing = 0.05,row_heights=[0.52, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "OBV", "Position", "Return"))
             
             fig.update_layout(width=1200, height=1600, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
@@ -182,23 +182,29 @@ class Stock(Asset):
                 row=4, col=1
             )
 
-            # Row 5 Position
+            # Row 5 OBV
+            fig.add_trace(
+                go.Scatter(x = self.plotdata.index, y = self.plotdata['OBV'],mode='lines',name='OBV'),
+                row=5, col=1
+            )
+
+            # Row 6 Position
             my_strategies = ["TEMA_RSI4"]
             colornbr = 0
             for my_strategy in my_strategies:
                 fig.add_trace(
                     go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
-                    row=5, col=1
+                    row=6, col=1
                 )
                 colornbr = colornbr + 1
 
-            # Row 6 Return
+            # Row 7 Return
             colornbr = 0
             my_strategies = ["TEMA_RSI4"]
             for my_strategy in my_strategies:                
                 fig.add_trace(
                     go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
-                    row=6, col=1
+                    row=7, col=1
                 )
                 colornbr = colornbr + 1
             
