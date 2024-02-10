@@ -9,6 +9,7 @@ class TEMA_RSI5(Stock):
         self.position = 0
 
     def define_position(self):
+        min_points = 4
         final_position = pd.Series()
         loopcount = 0
         for index, row in self.stock.stockdata.iterrows():
@@ -22,10 +23,14 @@ class TEMA_RSI5(Stock):
                 prev4_row = prev3_row
             else:
                 # Enter a position
-                if((row['RSI_X_ABOVE_30']==1 or prev1_row['RSI_X_ABOVE_30']==1 or prev2_row['RSI_X_ABOVE_30']==1 or prev3_row['RSI_X_ABOVE_30']==1) and \
-                   (row['TEMA5_X_ABOVE_TEMA20']==1 or prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1 or prev3_row['TEMA5_X_ABOVE_TEMA20']==1) and \
+                if row['RSI_X_ABOVE_30']==1: points = points + 1
+                if (prev1_row['RSI_X_ABOVE_30']==1 or \
+                    prev2_row['RSI_X_ABOVE_30']==1 or \
+                    prev3_row['RSI_X_ABOVE_30']==1) and \
+                   (row['TEMA5_X_ABOVE_TEMA20']==1 or \
+                    prev1_row['TEMA5_X_ABOVE_TEMA20']==1 or prev2_row['TEMA5_X_ABOVE_TEMA20']==1 or prev3_row['TEMA5_X_ABOVE_TEMA20']==1) and \
                    (row['MACD_X_ABOVE_MACDSignal']==1 or prev1_row['MACD_X_ABOVE_MACDSignal']==1 or prev2_row['MACD_X_ABOVE_MACDSignal']==1 or prev3_row['MACD_X_ABOVE_MACDSignal']==1) and \
-                    self.position == 0):                
+                    self.position == 0:                
                 #if ((row['TEMA5_X_ABOVE_TEMA20']==1 or row['RSI_X_ABOVE_30']==1 or row['MACD_X_ABOVE_MACDSignal']==1) 
                 #    and row['TEMA20_ABOVE_SMA50'] and row['RSI_ABOVE_30'] and row['MACD_ABOVE_MACDSignal'] and self.position == 0):
                     if pd.notna(pd.Series([1]).any()):

@@ -26,7 +26,7 @@ print(my_stock_test.stockdata)
 
 dataset_train = my_stock_train.stockdata
 dataset_test = my_stock_test.stockdata
-regressor = load_model("C:/Users/idefi/Documents/Scripts/stockmarket/regressor_model1.keras")
+regressor = load_model("C:/Users/idefi/Documents/Scripts/stockmarket/models/regressor_model1.keras")
 sc = MinMaxScaler(feature_range = (0, 1))
 #training_set_scaled = sc.fit_transform(training_set)
 

@@ -64,4 +64,4 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 regressor.fit(X_train, y_train, epochs = 100, batch_size = 32)
 
-regressor.save("C:/Users/idefi/Documents/Scripts/stockmarket/regressor_model1.keras")
+regressor.save("C:/Users/idefi/Documents/Scripts/stockmarket/models/regressor_model1.keras")

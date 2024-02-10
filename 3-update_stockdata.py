@@ -15,6 +15,59 @@ from patterns.cross import Cross
 import traceback
 import vectorbt as vbt
 from backtesting.lib import crossover
+from sklearn.preprocessing import MinMaxScaler
+
+def generate_spike_on_upward_cross(series1, series2, width=10):
+    # Ensure series1 and series2 are pandas Series
+    
+    series1 = series1.reset_index()
+    series2 = series2.reset_index()
+    #print(series1)
+    #pd.set_option('display.max_rows', None)
+    # Detect upward crossings
+    upward_crossings = (series1.iloc[:, 1].shift(1) < series2.iloc[:, 1].shift(1)) & (series1.iloc[:, 1] >= series2.iloc[:, 1])
+    #print(upward_crossings)
+    # Initialize the spike series with zeros
+    spike_series = pd.Series(np.zeros(len(series1)), index=series1.index)
+    #print(spike_series)
+    # Generate spikes using a Gaussian function centered at the crossing points
+    for i in upward_crossings[upward_crossings].index:
+        #print(i)
+        #print(spike_series.index)
+        gaussian = np.exp(-((spike_series.index - i) ** 2) / (2 * width ** 2))
+        spike_series += gaussian
+    
+    series1.set_index('Date', inplace=True)
+    #print(series1)
+    spike_series.index = series1.index
+    #print(spike_series)
+    return spike_series
+
+def generate_spike_on_downward_cross(series1, series2, width=10):
+    # Ensure series1 and series2 are pandas Series
+    
+    series1 = series1.reset_index()
+    series2 = series2.reset_index()
+    #print(series1)
+    #pd.set_option('display.max_rows', None)
+    # Detect upward crossings
+    downward_crossings = (series1.iloc[:, 1].shift(1) > series2.iloc[:, 1].shift(1)) & (series1.iloc[:, 1] <= series2.iloc[:, 1])
+    #print(upward_crossings)
+    # Initialize the spike series with zeros
+    spike_series = pd.Series(np.zeros(len(series1)), index=series1.index)
+    #print(spike_series)
+    # Generate spikes using a Gaussian function centered at the crossing points
+    for i in downward_crossings[downward_crossings].index:
+        #print(i)
+        #print(spike_series.index)
+        gaussian = np.exp(-((spike_series.index - i) ** 2) / (2 * width ** 2))
+        spike_series += gaussian
+    
+    series1.set_index('Date', inplace=True)
+    #print(series1)
+    spike_series.index = series1.index
+    #print(spike_series)
+    return spike_series
 
 def cross_above_function(prev_val1,cur_val1,prev_val2,cur_val2):
     try:
@@ -54,7 +107,8 @@ def main():
     cross_above = np.vectorize(cross_above_function)
     cross_below = np.vectorize(cross_below_function)
     print(sys.path)
-    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_rows', 10)
+    scaler = MinMaxScaler(feature_range=(-1, 1))
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -72,7 +126,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
@@ -89,6 +143,7 @@ def main():
     stoploss_pd.set_index("SL_Date",inplace=True)
 
     # DOWNLOAD DATA IN CHUNKS #
+    print("Number of tickers: " + str(len(my_tickers)))
     chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
     try:
         for chunk in chunks:
@@ -173,6 +228,16 @@ def main():
                 my_stock.stockdata['TEMA20_BELOW_SMA50'] = np.where(my_stock.stockdata['TEMA20'] < my_stock.stockdata['SMA50'], True, False)
                 my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
                 my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
+                my_stock.stockdata['RSI_DIFF_30'] = my_stock.stockdata["RSI"] - 30
+                my_stock.stockdata['RSI_DIFF_70'] = my_stock.stockdata["RSI"] - 70
+                my_stock.stockdata['CLOSE_X_ABOVE_SMA50'] = generate_spike_on_upward_cross(my_stock.stockdata['Close'], my_stock.stockdata['SMA50'], width=2)
+                my_stock.stockdata['CLOSE_X_BELOW_SMA50'] = generate_spike_on_downward_cross(my_stock.stockdata['Close'], my_stock.stockdata['SMA50'], width=2)
+                my_stock.stockdata['MACD_DIFF_MACDSignal'] = scaler.fit_transform((my_stock.stockdata['MACD'] - my_stock.stockdata['MACDSignal']).values.reshape(-1, 1))
+                my_stock.stockdata['TEMA5_DIFF_TEMA20'] = scaler.fit_transform((my_stock.stockdata['TEMA5'] - my_stock.stockdata['TEMA20']).values.reshape(-1, 1))
+                my_stock.stockdata['TEMA20_DIFF_SMA50'] = scaler.fit_transform((my_stock.stockdata['TEMA20'] - my_stock.stockdata['SMA50']).values.reshape(-1, 1))
+                my_stock.stockdata['STRAT1_BUY'] = my_stock.stockdata['CLOSE_X_ABOVE_SMA50']
+                my_stock.stockdata['STRAT1_SELL'] = my_stock.stockdata['CLOSE_X_BELOW_SMA50']
+                #my_stock.stockdata['BUY_SIGNAL'] = my_stock.stockdata['MACD_DIFF_MACDSignal'] + my_stock.stockdata['TEMA5_DIFF_TEMA20'] + my_stock.stockdata['TEMA20_DIFF_SMA50'] + my_stock.stockdata['CLOSE_DIFF_SMA50']
                 #my_stock.stockdata['curBuy'] = my_stock.stockdata['RSI_X_ABOVE_30'] + my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] #+ my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] 
                 #my_stock.stockdata['Buy'] = my_stock.stockdata['curBuy'].rolling(6, min_periods=1).sum()
                 #my_stock.stockdata['curSell'] = my_stock.stockdata['RSI_X_BELOW_70'] + my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] #+ my_stock.stockdata['MACD_X_BELOW_MACDSignal']
@@ -187,7 +252,7 @@ def main():
                 #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
                 #print(my_stock.stockdata["SL_Price"].tail(10))
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
-
+    
         except Exception as e:
             # Get the exception information including the line number
             exc_type, exc_obj, exc_tb = sys.exc_info()

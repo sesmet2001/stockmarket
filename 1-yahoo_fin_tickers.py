@@ -1,5 +1,6 @@
 import sqlite3
 import yahoo_fin.stock_info as si
+import yfinance as yf
 import pandas as pd
 import sqlite3
 import os
@@ -18,6 +19,7 @@ def main():
 
         # SP500 tickers
         lst_sp500_tickers = si.tickers_sp500()
+        lst_sp500_tickers = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0].Symbol
         pd_sp500_tickers = pd.DataFrame({"Ticker": lst_sp500_tickers})
         pd_sp500_tickers.set_index(['Ticker'])
 

@@ -15,6 +15,7 @@ from patterns.cross import Cross
 import traceback
 import vectorbt as vbt
 from backtesting.lib import crossover
+from strategies.Signal1 import Signal1
 from strategies.TEMA_RSI import TEMA_RSI
 from strategies.TEMA_RSI2 import TEMA_RSI2
 from strategies.TEMA_RSI3 import TEMA_RSI3
@@ -78,7 +79,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
@@ -90,9 +91,10 @@ def main():
             my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
-                my_stock.stockdata["TEMA_RSI"] = TEMA_RSI(my_stock).define_position()
-                my_stock.stockdata["TEMA_RSI2"] = TEMA_RSI2(my_stock).define_position()    
-                my_stock.stockdata["TEMA_RSI3"] = TEMA_RSI3(my_stock).define_position()
+                #my_stock.stockdata["Signal1"] = Signal1(my_stock).define_position()
+                #my_stock.stockdata["TEMA_RSI"] = TEMA_RSI(my_stock).define_position()
+                #my_stock.stockdata["TEMA_RSI2"] = TEMA_RSI2(my_stock).define_position()    
+                #my_stock.stockdata["TEMA_RSI3"] = TEMA_RSI3(my_stock).define_position()
                 my_stock.stockdata["TEMA_RSI4"] = TEMA_RSI4(my_stock).define_position()
                 #my_stock.stockdata["TEMA_RSI5"] = TEMA_RSI5(my_stock).define_position()
                 my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True) 
