@@ -16,36 +16,84 @@ import traceback
 import vectorbt as vbt
 from backtesting.lib import crossover
 from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 
-def generate_spike_on_upward_cross(series1, series2, width=10):
-    # Ensure series1 and series2 are pandas Series
+def gaussiancurve(x, mu, sigma):
+    """
+    Calculate the Gaussian function for the given x, mean (mu), and standard deviation (sigma).
+    """
+    prefactor = 1 / (sigma * np.sqrt(2 * np.pi))
+    exponent = -0.5 * ((x - mu) / sigma) ** 2
+    return prefactor * np.exp(exponent)
+
+def generate_signal_with_delay(numbers, decay_rate=0.1, delay_duration=1):
+    """
+    Generates a continuous signal based on the input series of numbers.
+    The signal lasts a bit longer after crossing 0 before starting to decay.
     
+    Parameters:
+    - numbers: A numpy array of numbers.
+    - decay_rate: Controls the rate at which the signal decays once it starts decaying.
+    - delay_duration: The number of steps the signal remains at its peak after crossing 0.
+    
+    Returns:
+    - A numpy array containing the signal values.
+    """
+    # Initialize the signal array
+    signal = np.zeros_like(numbers)
+    
+    delay_counter = 0  # Counter to manage the delay after crossing 0
+    
+    for i, num in enumerate(numbers):
+        if num < 0:
+            # For negative numbers, use an exponential function to increase signal towards 0
+            signal[i] = np.exp(num)  # Exponential increase towards 0
+        else:
+            if delay_counter > 0:
+                # We're in the delay period, keep the signal at its last peak
+                signal[i] = signal[i-1]
+                delay_counter -= 1  # Decrease delay counter
+            elif i > 0 and numbers[i-1] < 0:
+                # This is the first positive number immediately after crossing 0
+                # Start the delay period
+                delay_counter = delay_duration
+                signal[i] = signal[i-1]
+            elif delay_counter == 0 and signal[i-1] != 0:
+                # Once the delay is over, start decaying the signal
+                signal[i] = signal[i-1] * (1 - decay_rate)
+    
+    return signal
+
+
+def generate_spike_on_upward_cross(series1, series2):
+    width = 2
+    # Ensure series1 and series2 are pandas Series
     series1 = series1.reset_index()
     series2 = series2.reset_index()
     #print(series1)
     #pd.set_option('display.max_rows', None)
     # Detect upward crossings
     upward_crossings = (series1.iloc[:, 1].shift(1) < series2.iloc[:, 1].shift(1)) & (series1.iloc[:, 1] >= series2.iloc[:, 1])
-    #print(upward_crossings)
     # Initialize the spike series with zeros
     spike_series = pd.Series(np.zeros(len(series1)), index=series1.index)
-    #print(spike_series)
     # Generate spikes using a Gaussian function centered at the crossing points
     for i in upward_crossings[upward_crossings].index:
         #print(i)
         #print(spike_series.index)
         gaussian = np.exp(-((spike_series.index - i) ** 2) / (2 * width ** 2))
+        #print(gaussian)
+        #gaussian = gaussiancurve(spike_series.index,i,sigma)  
         spike_series += gaussian
-    
+
     series1.set_index('Date', inplace=True)
     #print(series1)
     spike_series.index = series1.index
     #print(spike_series)
     return spike_series
 
-def generate_spike_on_downward_cross(series1, series2, width=10):
-    # Ensure series1 and series2 are pandas Series
-    
+def generate_spike_on_downward_cross(series1, series2):
+    width = 2
+    # Ensure series1 and series2 are pandas Series    
     series1 = series1.reset_index()
     series2 = series2.reset_index()
     #print(series1)
@@ -61,6 +109,7 @@ def generate_spike_on_downward_cross(series1, series2, width=10):
         #print(i)
         #print(spike_series.index)
         gaussian = np.exp(-((spike_series.index - i) ** 2) / (2 * width ** 2))
+        #gaussian = gaussiancurve(spike_series.index,i,sigma)
         spike_series += gaussian
     
     series1.set_index('Date', inplace=True)
@@ -109,6 +158,10 @@ def main():
     print(sys.path)
     pd.set_option('display.max_rows', 10)
     scaler = MinMaxScaler(feature_range=(-1, 1))
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    np.set_printoptions(threshold=np.inf)
     
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -125,9 +178,9 @@ def main():
 
     # LOAD TICKER DATA #
     # test
-    # my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR PreciousMetals == 1 OR Crypto == 1 OR Portfolio == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1"""
+    #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
+    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1 AND Ticker <> 'BRK.B' LIMIT 2"""
+    
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
@@ -230,13 +283,26 @@ def main():
                 my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
                 my_stock.stockdata['RSI_DIFF_30'] = my_stock.stockdata["RSI"] - 30
                 my_stock.stockdata['RSI_DIFF_70'] = my_stock.stockdata["RSI"] - 70
-                my_stock.stockdata['CLOSE_X_ABOVE_SMA50'] = generate_spike_on_upward_cross(my_stock.stockdata['Close'], my_stock.stockdata['SMA50'], width=2)
-                my_stock.stockdata['CLOSE_X_BELOW_SMA50'] = generate_spike_on_downward_cross(my_stock.stockdata['Close'], my_stock.stockdata['SMA50'], width=2)
-                my_stock.stockdata['MACD_DIFF_MACDSignal'] = scaler.fit_transform((my_stock.stockdata['MACD'] - my_stock.stockdata['MACDSignal']).values.reshape(-1, 1))
-                my_stock.stockdata['TEMA5_DIFF_TEMA20'] = scaler.fit_transform((my_stock.stockdata['TEMA5'] - my_stock.stockdata['TEMA20']).values.reshape(-1, 1))
-                my_stock.stockdata['TEMA20_DIFF_SMA50'] = scaler.fit_transform((my_stock.stockdata['TEMA20'] - my_stock.stockdata['SMA50']).values.reshape(-1, 1))
-                my_stock.stockdata['STRAT1_BUY'] = my_stock.stockdata['CLOSE_X_ABOVE_SMA50']
-                my_stock.stockdata['STRAT1_SELL'] = my_stock.stockdata['CLOSE_X_BELOW_SMA50']
+                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_spike_on_upward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'])
+                
+                my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_signal_with_delay(my_stock.stockdata['TEMA5']-my_stock.stockdata['SMA50'])
+                my_stock.stockdata['TEMA5_X_BELOW_SMA50'] = generate_spike_on_downward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'])
+                my_stock.stockdata['TEMA5_X_ABOVE_SMA50_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] - my_stock.stockdata['TEMA5_X_BELOW_SMA50']
+                my_stock.stockdata['TEMA5_X_BELOW_SMA50_NET'] = my_stock.stockdata['TEMA5_X_BELOW_SMA50'] - my_stock.stockdata['TEMA5_X_ABOVE_SMA50']
+                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = generate_spike_on_upward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'])
+                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = generate_spike_on_downward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'])
+                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] - my_stock.stockdata['TEMA5_X_BELOW_TEMA20']
+                my_stock.stockdata['TEMA5_X_BELOW_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] - my_stock.stockdata['TEMA5_X_ABOVE_TEMA20']
+                #my_stock.stockdata['CLOSE_X_NET_SMA50'] = my_stock.stockdata['CLOSE_X_ABOVE_SMA50'] - my_stock.stockdata['CLOSE_X_BELOW_SMA50']
+                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = generate_spike_on_upward_cross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'])
+                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = generate_spike_on_downward_cross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'])
+                my_stock.stockdata['MACD_X_NET_MACDSignal'] = my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] - my_stock.stockdata['MACD_X_BELOW_MACDSignal']
+                my_stock.stockdata['RSI_X_ABOVE_30'] = generate_spike_on_upward_cross(my_stock.stockdata["RSI"], pd.Series(40, index=my_stock.stockdata["RSI"].index))
+                my_stock.stockdata['RSI_X_BELOW_70'] = generate_spike_on_downward_cross(my_stock.stockdata["RSI"], pd.Series(60, index=my_stock.stockdata["RSI"].index))
+                my_stock.stockdata['RSI_X_NET'] = my_stock.stockdata['RSI_X_ABOVE_30'] - my_stock.stockdata['RSI_X_BELOW_70']
+                #my_stock.stockdata['MACD_DIFF_MACDSignal'] = scaler.fit_transform((my_stock.stockdata['MACD'] - my_stock.stockdata['MACDSignal']).values.reshape(-1, 1))
+                #my_stock.stockdata['TEMA5_DIFF_TEMA20'] = scaler.fit_transform((my_stock.stockdata['TEMA5'] - my_stock.stockdata['TEMA20']).values.reshape(-1, 1))
+                #my_stock.stockdata['TEMA20_DIFF_SMA50'] = scaler.fit_transform((my_stock.stockdata['TEMA20'] - my_stock.stockdata['SMA50']).values.reshape(-1, 1))
                 #my_stock.stockdata['BUY_SIGNAL'] = my_stock.stockdata['MACD_DIFF_MACDSignal'] + my_stock.stockdata['TEMA5_DIFF_TEMA20'] + my_stock.stockdata['TEMA20_DIFF_SMA50'] + my_stock.stockdata['CLOSE_DIFF_SMA50']
                 #my_stock.stockdata['curBuy'] = my_stock.stockdata['RSI_X_ABOVE_30'] + my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] #+ my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] 
                 #my_stock.stockdata['Buy'] = my_stock.stockdata['curBuy'].rolling(6, min_periods=1).sum()
