@@ -16,7 +16,7 @@ df = pd.read_sql_query(query, conn)
 # Create a scatter plot
 fig = px.scatter(df, x='enterpriseToRevenue', y='trailingEps',
                  color='sector',  # Color points by the 'species' column
-                 hover_data=['shortName', 'enterpriseToRevenue', 'trailingEps'])  
+                 hover_data=['enterpriseToRevenue', 'trailingEps','shortName'])  
 
 fig.update_layout(
     title="Zoomed View on Specific Range",
