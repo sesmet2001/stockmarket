@@ -197,25 +197,21 @@ class Stock(Asset):
             
             # Row 4 RSI Signal 
             fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',name='RSI BELOW 60'),
+                go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',line_shape='spline',name='RSI BELOW 60'),
                 row=4, col=1
             )
             fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['RSI_X_ABOVE_30'],mode='lines',name='RSI ABOVE 40'),
-                row=4, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['RSI_X_NET'],mode='lines',name='RSI NET'),
+                go.Scatter(x = self.plotdata.index, y = self.plotdata['RSI_X_ABOVE_30'],mode='lines',line_shape='spline',name='RSI ABOVE 40'),
                 row=4, col=1
             )
 
             # Row 5 MACD
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['MACD'],mode='lines',name='MACD'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['MACD'],mode='lines',line_shape='spline',name='MACD'),
                 row=5, col=1
             )
             fig.add_trace(
-                go.Scatter(x=self.plotdata.index,y=self.plotdata['MACDSignal'],mode='lines',name='MACD Signal'),
+                go.Scatter(x=self.plotdata.index,y=self.plotdata['MACDSignal'],mode='lines',line_shape='spline',name='MACD Signal'),
                 row=5, col=1
             )
             fig.add_trace(
@@ -225,15 +221,15 @@ class Stock(Asset):
 
             # Row 6 MACD Signal
             fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',name='MACD ABOVE Signal'),
+                go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',line_shape='spline',name='MACD ABOVE Signal'),
                 row=6, col=1
             )
             fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_ABOVE_MACDSignal'],mode='lines',name='MACD Below Signal'),
+                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_ABOVE_MACDSignal'],mode='lines',line_shape='spline',name='MACD Below Signal'),
                 row=6, col=1
             )
             fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_NET_MACDSignal'],mode='lines',name='MACD NET'),
+                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_NET_MACDSignal'],mode='lines',line_shape='spline',name='MACD NET'),
                 row=6, col=1
             )
             
