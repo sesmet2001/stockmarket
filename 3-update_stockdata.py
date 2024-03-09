@@ -52,16 +52,16 @@ def generate_signal_with_delay(numbers, decay_rate=0.1, delay_duration=1):
         else:
             if delay_counter > 0:
                 # We're in the delay period, keep the signal at its last peak
-                signal[i] = signal[i-1]
+                signal[i] = signal.iloc[i-1]
                 delay_counter -= 1  # Decrease delay counter
             elif i > 0 and numbers.iloc[i-1] < 0:
                 # This is the first positive number immediately after crossing 0
                 # Start the delay period
                 delay_counter = delay_duration
-                signal[i] = signal[i-1]
+                signal[i] = signal.iloc[i-1]
             elif delay_counter == 0 and signal[i-1] != 0:
                 # Once the delay is over, start decaying the signal
-                signal[i] = signal[i-1] * (1 - decay_rate)
+                signal[i] = signal.iloc[i-1] * (1 - decay_rate)
     
     return signal
 
@@ -259,7 +259,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1 AND Ticker <> 'BRK.B'"""
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND Ticker <> "BRK.B"'
     
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
