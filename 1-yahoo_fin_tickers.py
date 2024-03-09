@@ -61,37 +61,39 @@ def main():
         # Concat and remove duplicates
         pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
+        pd_alltemp_tickers = pd_all_tickers[pd_all_tickers['Ticker'] != 'BRK.B']
+        pd_final_tickers = pd_alltemp_tickers[pd_alltemp_tickers['Ticker'] != 'BF.B']
 
-        print(pd_all_tickers)
+        print(pd_final_tickers)
 
         # Mark tickers
-        for index, row in pd_all_tickers.iterrows():
+        for index, row in pd_final_tickers.iterrows():
             for my_ticker in lst_dow_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Dow"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Dow"] = 1
             for my_ticker in lst_sp500_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "SP500"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "SP500"] = 1
             for my_ticker in lst_nasdaq_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Nasdaq"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Nasdaq"] = 1
             for my_ticker in lst_portfolio_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
             for my_ticker in lst_precious_metals_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
             for my_ticker in lst_exchange_rates_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "ExchangeRates"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "ExchangeRates"] = 1
             for my_ticker in lst_oil_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Oil"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Oil"] = 1
             for my_ticker in lst_crypto_tickers:
                 if my_ticker == row['Ticker']:
-                    pd_all_tickers.loc[pd_all_tickers['Ticker'] == my_ticker, "Crypto"] = 1
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Crypto"] = 1
 
-        pd_all_tickers.to_sql('_yahoo_fin_tickers', con=conn_info, if_exists='replace')
+        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn_info, if_exists='replace')
         conn_info.close()
         print("all done")
     except Exception as e:
