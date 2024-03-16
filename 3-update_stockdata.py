@@ -267,13 +267,13 @@ def main():
     #my_tickers = ["MSFT","NVDA"]
 
     # LOAD TRANSACTIONS
-    if os.name == 'nt':
-        print(os.name)
-        stoploss_pd = pd.read_csv("./stoploss-win.txt")
-    else:
-        print(os.name)
-        stoploss_pd = pd.read_csv("./stoploss.txt")
-    stoploss_pd.set_index("SL_Date",inplace=True)
+    #if os.name == 'nt':
+    #    print(os.name)
+    #    stoploss_pd = pd.read_csv("./stoploss-win.txt")
+    #else:
+    #    print(os.name)
+    #    stoploss_pd = pd.read_csv("./stoploss.txt")
+    #stoploss_pd.set_index("SL_Date",inplace=True)
 
     # DOWNLOAD DATA IN CHUNKS #
     print("Number of tickers: " + str(len(my_tickers)))
