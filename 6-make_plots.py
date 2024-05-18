@@ -1,3 +1,5 @@
+# v0.1
+
 from pandas_datareader.data import DataReader
 import pandas as pd
 from datetime import datetime, timedelta
