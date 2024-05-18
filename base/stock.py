@@ -105,6 +105,7 @@ class Stock(Asset):
     def plotbasegraph(self,my_imagepath,my_plotrange,my_strategies,my_colors):
         try:
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
+            print(self.plotdata['SMA50'])
             #self.plotdata['Date2'] = self.plotdata['Date']
             #self.plotdata.set_index('Date',inplace=True)
             #if self.plotdata['CumulativeReturn'].iloc[-1]:
