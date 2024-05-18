@@ -111,9 +111,9 @@ class Stock(Asset):
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
-            fig = make_subplots(rows=9,cols=1,vertical_spacing = 0.03,row_heights=[0.36, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "TEMA5-Signal", "RSI", "RSI-Signal", "MACD", "MACD-Signal", "Total-Signal", "Return", "Free"))
+            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.03,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
             
-            fig.update_layout(width=1200, height=2500, title_x=0.5)
+            fig.update_layout(width=1200, height=1500, title_x=0.5)
             fig.update_layout(xaxis_rangeslider_visible=False)
             
             # Row 1 Open Close
@@ -155,18 +155,18 @@ class Stock(Asset):
             #)
 
             # Row 2 SMA Signal
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['TEMA5_X_ABOVE_SMA50'],mode='lines',line_shape='spline',name='TEMA5 ABOVE SMA50'),
-                row=2, col=1
-            )
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['TEMA5_X_ABOVE_SMA50'],mode='lines',line_shape='spline',name='TEMA5 ABOVE SMA50'),
+            #    row=2, col=1
+            #)
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = self.plotdata['TEMA5_X_ABOVE_TEMA20_NET'],mode='lines',name='TEMA5 ABOVE TEMA20 NET'),
             #    row=2, col=1
             #)
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['TEMA5_X_BELOW_SMA50'],mode='lines',line_shape='spline',name='TEMA5 BELOW SMA50'),
-                row=2, col=1
-            )
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['TEMA5_X_BELOW_SMA50'],mode='lines',line_shape='spline',name='TEMA5 BELOW SMA50'),
+            #    row=2, col=1
+            #)
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = self.plotdata['TEMA5_X_BELOW_TEMA20_NET'],mode='lines',name='TEMA5 BELOW TEMA20 NET'),
             #    row=2, col=1
@@ -187,89 +187,89 @@ class Stock(Asset):
             #    row=2, col=1
             #)
 
-            # Row 3 RSI
+            # Row 2 RSI
             fig.add_trace(
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['RSI'],mode='lines',name='RSI',showlegend=False,marker={"color": "rgba(128,128,128,0.5)"}),
-                row=3, col=1
+                row=2, col=1
             )
-            fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=3, col=1)
-            fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=3, col=1)
+            fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=2, col=1)
+            fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=2, col=1)
             
             # Row 4 RSI Signal 
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',line_shape='spline',name='RSI BELOW 60'),
-                row=4, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['RSI_X_ABOVE_30'],mode='lines',line_shape='spline',name='RSI ABOVE 40'),
-                row=4, col=1
-            )
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',line_shape='spline',name='RSI BELOW 60'),
+            #    row=4, col=1
+            #)
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['RSI_X_ABOVE_30'],mode='lines',line_shape='spline',name='RSI ABOVE 40'),
+            #    row=4, col=1
+            #)
 
-            # Row 5 MACD
+            # Row 3 MACD
             fig.add_trace(
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['MACD'],mode='lines',line_shape='spline',name='MACD'),
-                row=5, col=1
+                row=3, col=1
             )
             fig.add_trace(
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['MACDSignal'],mode='lines',line_shape='spline',name='MACD Signal'),
-                row=5, col=1
+                row=3, col=1
             )
             fig.add_trace(
                 go.Bar(x = self.plotdata.index, y = self.plotdata['MACDHist'],name='MACD Histogram',marker={"color": "rgba(128,128,128,0.5)"}),
-                row=5, col=1
+                row=3, col=1
             )
 
             # Row 6 MACD Signal
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',line_shape='spline',name='MACD ABOVE Signal'),
-                row=6, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_ABOVE_MACDSignal'],mode='lines',line_shape='spline',name='MACD Below Signal'),
-                row=6, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_NET_MACDSignal'],mode='lines',line_shape='spline',name='MACD NET'),
-                row=6, col=1
-            )
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',line_shape='spline',name='MACD ABOVE Signal'),
+            #    row=6, col=1
+            #)
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_ABOVE_MACDSignal'],mode='lines',line_shape='spline',name='MACD Below Signal'),
+            #    row=6, col=1
+            #)
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_X_NET_MACDSignal'],mode='lines',line_shape='spline',name='MACD NET'),
+            #    row=6, col=1
+            #)
             
             # Row 7 Position
-            my_strategies = ["Strat1"]
-            colornbr = 0
-            for my_strategy in my_strategies:
-                fig.add_trace(
-                    go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
-                    row=7, col=1
-                )
-                colornbr = colornbr + 1
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = -self.plotdata['STRAT1_SELL'],mode='lines',name='SELL'),
-                row=7, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['STRAT1_BUY'],mode='lines',name='BUY'),
-                row=7, col=1
-            )
-            fig.add_trace(
-                go.Scatter(x = self.plotdata.index, y = self.plotdata['STRAT1_BUY-SELL'],mode='lines',name='NET'),
-                row=7, col=1
-            )
+            #my_strategies = ["Strat1"]
+            #colornbr = 0
+            #for my_strategy in my_strategies:
+            #    fig.add_trace(
+            #        go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
+            #        row=7, col=1
+            #    )
+            #    colornbr = colornbr + 1
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['STRAT1_SELL'],mode='lines',name='SELL'),
+            #    row=7, col=1
+            #)
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['STRAT1_BUY'],mode='lines',name='BUY'),
+            #    row=7, col=1
+            #)
+            #fig.add_trace(
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['STRAT1_BUY-SELL'],mode='lines',name='NET'),
+            #    row=7, col=1
+            #)
 
             # Row 8 Return
-            colornbr = 0
-            my_strategies = ["Strat1"]
-            for my_strategy in my_strategies:                
-                fig.add_trace(
-                    go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
-                    row=8, col=1
-                )
-                colornbr = colornbr + 1
+            #colornbr = 0
+            #my_strategies = ["Strat1"]
+            #for my_strategy in my_strategies:                
+            #    fig.add_trace(
+            #        go.Scatter(x=self.plotdata.index,y=self.plotdata[my_strategy + "_total_return"],mode='lines',marker_color=my_colors[colornbr],name=my_strategy),
+            #        row=8, col=1
+            #    )
+            #    colornbr = colornbr + 1
             
-            # Row 9 Volume
-            #fig.add_trace(
-            #    go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
-            #    row=4, col=1
-            #)
+            # Row 4 Volume
+            fig.add_trace(
+                go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
+                row=4, col=1
+            )
 
             # Row 10 OBV
             #fig.add_trace(
@@ -288,8 +288,8 @@ class Stock(Asset):
             #fig.update_traces(marker_color=df["Color"])
 
             # Add signals
-            TEMA5_X_ABOVE_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_ABOVE_TEMA20"] == 1]
-            TEMA5_X_BELOW_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_BELOW_TEMA20"] == 1]
+            #TEMA5_X_ABOVE_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_ABOVE_TEMA20"] == 1]
+            #TEMA5_X_BELOW_TEMA20 = self.plotdata[self.plotdata["TEMA5_X_BELOW_TEMA20"] == 1]
             #for i,row in TEMA5_X_ABOVE_TEMA20.iterrows():
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
             #for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
