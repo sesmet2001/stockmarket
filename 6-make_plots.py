@@ -33,8 +33,8 @@ def main():
     DB_PATH = os.getenv('DB_PATH')
     conn_data = sqlite3.connect(DB_PATH + "/database/stockradar-lite-data.db")
     cur_data = conn_data.cursor()
-    conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
-    cur_info = conn_info.cursor()
+    conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
+    cur_tickers = conn_tickers.cursor()
 
     my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
@@ -45,10 +45,10 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'
    
-    cur_info.execute(my_ticker_query)    
-    my_tickers_list = cur_info.fetchall()
+    cur_tickers.execute(my_ticker_query)    
+    my_tickers_list = cur_tickers.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
     #my_tickers = ["MSFT","NVDA"]
 
@@ -57,7 +57,7 @@ def main():
             my_stock = Stock(conn_data,my_ticker,my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
-                my_stock.plotbasegraph(DB_PATH + "/graphs" + "/",my_plotrange,my_strategies,my_colors)
+                my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors)
 
         except Exception as e:
             # Get the exception information including the line number
@@ -72,8 +72,8 @@ def main():
 
     cur_data.close()
     conn_data.close()
-    cur_info.close()
-    conn_info.close()
+    cur_tickers.close()
+    conn_tickers.close()
 
 if __name__ == "__main__":
     main()
