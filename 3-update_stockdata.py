@@ -259,11 +259,12 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B") LIMIT 10'
     
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
+    #
     #my_tickers = ["MSFT","NVDA"]
 
     # LOAD TRANSACTIONS
