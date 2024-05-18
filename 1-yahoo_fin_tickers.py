@@ -9,8 +9,15 @@ def main():
     try:
         # Define variables
         DB_PATH = os.getenv('DB_PATH')
-        conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-info.db")
+        conn_info = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)
+
+        # Screener tickers
+        conn_screener = sqlite3.connect('C:\wamp64\www\html\database\stockradar-lite-screener.db')
+        pd_screener_tickers = pd.read_sql_query("SELECT symbol FROM screener", conn_screener)
+        lst_screener_tickers = pd_screener_tickers['symbol'].tolist()
+        pd_screener_tickers.rename(columns={'symbol': 'Ticker'}, inplace=True)
+        pd_screener_tickers.set_index(['Ticker'])
 
         # Dow Jones tickers
         lst_dow_tickers = si.tickers_dow()
@@ -68,6 +75,9 @@ def main():
 
         # Mark tickers
         for index, row in pd_final_tickers.iterrows():
+            for my_ticker in lst_screener_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Screener"] = 1
             for my_ticker in lst_dow_tickers:
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Dow"] = 1
