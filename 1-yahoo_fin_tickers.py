@@ -66,7 +66,7 @@ def main():
         # pd_other_tickers.set_index(['Ticker'])
 
         # Concat and remove duplicates
-        pd_all_tickers = pd.concat([pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers])
+        pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
         pd_alltemp_tickers = pd_all_tickers[pd_all_tickers['Ticker'] != 'BRK.B']
         pd_final_tickers = pd_alltemp_tickers[pd_alltemp_tickers['Ticker'] != 'BF.B']
