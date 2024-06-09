@@ -262,9 +262,9 @@ def main():
     my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'    
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
-    my_tickers = [x[0] for x in my_tickers_list]
-    #
-    #my_tickers = ["MSFT","NVDA"]
+    my_tickers_orig = [x[0] for x in my_tickers_list]
+    my_tickers = [s.replace('.', '-') for s in my_tickers_orig]
+    #my_tickers = ["BABA","CRWD"]
 
     # LOAD TRANSACTIONS
     #if os.name == 'nt':
@@ -280,9 +280,9 @@ def main():
     chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
     try:
         for chunk in chunks:
-            print(str(chunk) + "\n")
+            #print(str(chunk) + "\n")
             data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
-            print(data.describe())
+            #print(data.describe())
             for my_ticker in chunk:
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
