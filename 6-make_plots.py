@@ -52,7 +52,7 @@ def main():
     cur_tickers.execute(my_ticker_query)    
     my_tickers_list = cur_tickers.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
-    #my_tickers = ["MSFT","NVDA"]
+    my_tickers = ["BABA","CRWD"]
 
     for my_ticker in my_tickers:
         try:
