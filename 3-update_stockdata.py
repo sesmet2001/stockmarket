@@ -259,7 +259,7 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'    
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
     cur_info.execute(my_ticker_query)    
     my_tickers_list = cur_info.fetchall()
     my_tickers_orig = [x[0] for x in my_tickers_list]
@@ -283,6 +283,7 @@ def main():
             #print(str(chunk) + "\n")
             data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
             #print(data.describe())
+            print(chunk)
             for my_ticker in chunk:
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
@@ -333,10 +334,10 @@ def main():
                 my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
                 my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=6)
                 my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
-                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
-                my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change()
-                my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
-                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
+                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change(fill_method=None)
+                my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change(fill_method=None)
+                my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change(fill_method=None)
+                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change(fill_method=None)
                 my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
                 my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
                 my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
