@@ -38,7 +38,7 @@ def main():
     conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
     cur_tickers = conn_tickers.cursor()
 
-    my_start = datetime(2022, 1, 1)
+    my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -47,12 +47,12 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) AND (Ticker <> "BRK.B" OR Ticker <> "BF.B")'
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'
    
     cur_tickers.execute(my_ticker_query)    
     my_tickers_list = cur_tickers.fetchall()
     my_tickers = [x[0] for x in my_tickers_list]
-    my_tickers = ["BABA","CRWD"]
+    #my_tickers = ["BABA","CRWD"]
 
     for my_ticker in my_tickers:
         try:
