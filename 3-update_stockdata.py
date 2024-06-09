@@ -285,6 +285,7 @@ def main():
             #print(data.describe())
             #print(chunk)
             for my_ticker in chunk:
+                print(my_ticker)
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
                 #my_ticker_df["Ticker"] = my_ticker
