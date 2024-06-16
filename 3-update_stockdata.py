@@ -250,7 +250,7 @@ def main():
     conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
     cur_info = conn_tickers.cursor()
 
-    my_start = datetime(2016, 1, 1)
+    my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
