@@ -248,7 +248,7 @@ def main():
     conn_data = sqlite3.connect(DB_PATH + "/database/stockradar-lite-data.db")
     cur_data = conn_data.cursor()
     conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
-    cur_info = conn_tickers.cursor()
+    cur_tickers = conn_tickers.cursor()
 
     my_start = datetime(2020, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
@@ -262,8 +262,8 @@ def main():
     #my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
     my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1'    
     
-    cur_info.execute(my_ticker_query)    
-    my_tickers_list = cur_info.fetchall()
+    cur_tickers.execute(my_ticker_query)    
+    my_tickers_list = cur_tickers.fetchall()
     my_tickers_orig = [x[0] for x in my_tickers_list]
     my_tickers = [s.replace('.', '-') for s in my_tickers_orig]
     my_tickers = [s.replace('VUSA-AS', 'VUSA.AS') for s in my_tickers]
@@ -419,7 +419,7 @@ def main():
 
     cur_data.close()
     conn_data.close()
-    cur_info.close()
+    cur_tickers.close()
     conn_tickers.close()
 
 if __name__ == "__main__":
