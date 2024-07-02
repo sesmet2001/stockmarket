@@ -297,7 +297,7 @@ class Stock(Asset):
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
             #for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
-            print("before printing")
+            print("before printing " + my_imagepath)
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido")
             print("after printing")
             end_time = time.time()
