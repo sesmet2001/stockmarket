@@ -147,6 +147,7 @@ class Stock(Asset):
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey',opacity=0.2),
                 row=1, col=1
             )
+            print("row 1 printed")
             #fig.add_trace(
             #    go.Scatter(x=self.plotdata.index,y=self.plotdata['SL_Price'],mode='markers',name='Stop Loss',line_color='red',opacity=1),
             #    row=1, col=1
@@ -196,7 +197,7 @@ class Stock(Asset):
             )
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=2, col=1)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=2, col=1)
-            
+            print("row 2 printed")
             # Row 4 RSI Signal 
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',line_shape='spline',name='RSI BELOW 60'),
@@ -220,7 +221,7 @@ class Stock(Asset):
                 go.Bar(x = self.plotdata.index, y = self.plotdata['MACDHist'],name='MACD Histogram',marker={"color": "rgba(128,128,128,0.5)"}),
                 row=3, col=1
             )
-
+            print("row 3 printed")
             # Row 6 MACD Signal
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',line_shape='spline',name='MACD ABOVE Signal'),
@@ -272,7 +273,7 @@ class Stock(Asset):
                 go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
                 row=4, col=1
             )
-
+            print("row 4 printed")
             # Row 10 OBV
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = self.plotdata['OBV'],mode='lines',name='OBV'),
