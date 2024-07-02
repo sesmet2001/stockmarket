@@ -12,6 +12,7 @@ import sys
 import plotly.io as pio 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import time
 
 class Stock(Asset):
     def __init__(self, my_conn, my_ticker, my_startdate, my_enddate):
@@ -94,8 +95,8 @@ class Stock(Asset):
         try: 
             #self.stockdata['DailyReturns'].dropna()
             #self.stockdata['Position'].dropna()
-            print(self.stockdata['ClosePercentChange'])
-            print(self.stockdata['Position'])
+            #print(self.stockdata['ClosePercentChange'])
+            #print(self.stockdata['Position'])
             #my_return = self.stockdata.loc['ClosePercentChange'].dot(self.stockdata.loc['Position'])
             #return my_return
             return my_startcapital
@@ -104,6 +105,7 @@ class Stock(Asset):
 
     def plotbasegraph(self,my_imagepath,my_plotrange,my_strategies,my_colors):
         try:
+            start_time = time.time()
             self.plotdata = self.stockdata.tail(my_plotrange).copy()
             #self.plotdata['Date2'] = self.plotdata['Date']
             #self.plotdata.set_index('Date',inplace=True)
@@ -296,6 +298,11 @@ class Stock(Asset):
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
 
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido") 
+            end_time = time.time()
+
+            # Calculate total time taken
+            elapsed_time = end_time - start_time
+            print(f"Execution time: {elapsed_time} seconds")
             return 1
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
