@@ -288,7 +288,7 @@ def main():
             #print(data.describe())
             #print(chunk)
             for my_ticker in chunk:
-                print(my_ticker)
+                #print(my_ticker)
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
                 #my_ticker_df["Ticker"] = my_ticker
@@ -307,6 +307,7 @@ def main():
         print(f"Exception occurred on line {line_number}: {e}")
         pass
     
+    print("Calculate Features:")
     for my_ticker in my_tickers:
         try:
             my_stock = Stock(conn_data,my_ticker,my_start,my_end)
@@ -336,57 +337,64 @@ def main():
                 my_stock.stockdata["TEMA20"] = ta.TEMA(my_stock.stockdata['Close'],20)
                 my_stock.stockdata["TEMA50"] = ta.TEMA(my_stock.stockdata['Close'],50)
                 my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
-                my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=6)
+                my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=10)
                 my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
                 my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
                 my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change()
                 my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
-                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
+
                 my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
                 my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
                 my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
                 my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
                 my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
                 my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
-                my_stock.stockdata['RSI_X_ABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],30,30)
-                my_stock.stockdata['RSI_X_BELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],70,70)
+
+                my_stock.stockdata['30'] = 30 
+                my_stock.stockdata['70'] = 70 
+                my_stock.stockdata['RSI_XABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['30'],my_stock.stockdata['30'])
+                my_stock.stockdata['RSI_XBELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['70'],my_stock.stockdata['70'])
                 #my_stock.stockdata['RSI_position'] = RSI_position(my_stock.stockdata['RSI_X_ABOVE_30'],my_stock.stockdata['RSI_X_BELOW_70'])
-                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
-                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
-                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
-                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
-                my_stock.stockdata['RSI_ABOVE_50'] = np.where(my_stock.stockdata['RSI'] > 50, True, False)
-                my_stock.stockdata['RSI_BELOW_50'] = np.where(my_stock.stockdata['RSI'] < 50, True, False)
-                my_stock.stockdata['RSI_ABOVE_70'] = np.where(my_stock.stockdata['RSI'] > 70, True, False)
-                my_stock.stockdata['RSI_BELOW_70'] = np.where(my_stock.stockdata['RSI'] < 70, True, False)
-                my_stock.stockdata['RSI_BELOW_30'] = np.where(my_stock.stockdata['RSI'] < 30, True, False)
-                my_stock.stockdata['RSI_ABOVE_30'] = np.where(my_stock.stockdata['RSI'] > 30, True, False)
-                my_stock.stockdata['TEMA5_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], True, False)
-                my_stock.stockdata['TEMA5_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], True, False)
-                my_stock.stockdata['TEMA20_ABOVE_SMA50'] = np.where(my_stock.stockdata['TEMA20'] > my_stock.stockdata['SMA50'], True, False)
-                my_stock.stockdata['TEMA20_BELOW_SMA50'] = np.where(my_stock.stockdata['TEMA20'] < my_stock.stockdata['SMA50'], True, False)
-                my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
-                my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
-                my_stock.stockdata['RSI_DIFF_30'] = my_stock.stockdata["RSI"] - 30
-                my_stock.stockdata['RSI_DIFF_70'] = my_stock.stockdata["RSI"] - 70
+                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                #my_stock.stockdata['MACD_XABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                #my_stock.stockdata['MACD_XBELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                # Create buy signals where RSI crosses below 30
+                #my_stock.stockdata['MACD_XBELOW_MACDSignal'] = my_stock.stockdata[(my_stock.stockdata['RSI'] < 70) & (my_stock.stockdata['prevRSI'] >= 70)]
+                #my_stock.stockdata['RSI_ABOVE_50'] = np.where(my_stock.stockdata['RSI'] > 50, True, False)
+                #my_stock.stockdata['RSI_BELOW_50'] = np.where(my_stock.stockdata['RSI'] < 50, True, False)
+                #my_stock.stockdata['RSI_ABOVE_70'] = np.where(my_stock.stockdata['RSI'] > 70, True, False)
+                #my_stock.stockdata['RSI_BELOW_70'] = np.where(my_stock.stockdata['RSI'] < 70, True, False)
+                #my_stock.stockdata['RSI_BELOW_30'] = np.where(my_stock.stockdata['RSI'] < 30, True, False)
+                #my_stock.stockdata['RSI_ABOVE_30'] = np.where(my_stock.stockdata['RSI'] > 30, True, False)
+                #my_stock.stockdata['TEMA5_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], True, False)
+                #my_stock.stockdata['TEMA5_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], True, False)
+                #my_stock.stockdata['TEMA20_ABOVE_SMA50'] = np.where(my_stock.stockdata['TEMA20'] > my_stock.stockdata['SMA50'], True, False)
+                #my_stock.stockdata['TEMA20_BELOW_SMA50'] = np.where(my_stock.stockdata['TEMA20'] < my_stock.stockdata['SMA50'], True, False)
+                #my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
+                #my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
+                #my_stock.stockdata['RSI_DIFF_30'] = my_stock.stockdata["RSI"] - 30
+                #my_stock.stockdata['RSI_DIFF_70'] = my_stock.stockdata["RSI"] - 70
+                #my_stock.stockdata['SMA50_DIFF_TEMA20'] = my_stock.stockdata["SMA50"] - my_stock.stockdata["TEMA20"]
+                #my_stock.stockdata['SMA50_DIFF_TEMA5'] = my_stock.stockdata["SMA50"] - my_stock.stockdata["TEMA5"]
                 #my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_spike_on_upward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'])
                 
-                my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'],my_stock.stockdata['SMA50'],0.5)
-                my_stock.stockdata['TEMA5_X_BELOW_SMA50'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'],1)
-                my_stock.stockdata['TEMA5_X_ABOVE_SMA50_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] - my_stock.stockdata['TEMA5_X_BELOW_SMA50']
-                my_stock.stockdata['TEMA5_X_BELOW_SMA50_NET'] = my_stock.stockdata['TEMA5_X_BELOW_SMA50'] - my_stock.stockdata['TEMA5_X_ABOVE_SMA50']
-                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
-                my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
-                my_stock.stockdata['TEMA5_X_ABOVE_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] - my_stock.stockdata['TEMA5_X_BELOW_TEMA20']
-                my_stock.stockdata['TEMA5_X_BELOW_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] - my_stock.stockdata['TEMA5_X_ABOVE_TEMA20']
+                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'],my_stock.stockdata['SMA50'],0.5)
+                #my_stock.stockdata['TEMA5_X_BELOW_SMA50'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'],1)
+                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] - my_stock.stockdata['TEMA5_X_BELOW_SMA50']
+                #my_stock.stockdata['TEMA5_X_BELOW_SMA50_NET'] = my_stock.stockdata['TEMA5_X_BELOW_SMA50'] - my_stock.stockdata['TEMA5_X_ABOVE_SMA50']
+                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
+                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
+                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] - my_stock.stockdata['TEMA5_X_BELOW_TEMA20']
+                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] - my_stock.stockdata['TEMA5_X_ABOVE_TEMA20']
                 #my_stock.stockdata['CLOSE_X_NET_SMA50'] = my_stock.stockdata['CLOSE_X_ABOVE_SMA50'] - my_stock.stockdata['CLOSE_X_BELOW_SMA50']
-                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = generate_signal_on_upcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
-                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = generate_signal_on_downcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
-                my_stock.stockdata['MACD_X_NET_MACDSignal'] = my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] - my_stock.stockdata['MACD_X_BELOW_MACDSignal']
-                signals = generate_signals(my_stock.stockdata["RSI"])
-                signals_series = pd.Series(signals, index=my_stock.stockdata["RSI"].index)
-                my_stock.stockdata['RSI_X_ABOVE_30'] = signals_series[signals_series == 1]
-                my_stock.stockdata['RSI_X_BELOW_70'] = signals_series[signals_series == -1]
+                #my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = generate_signal_on_upcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
+                #my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = generate_signal_on_downcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
+                #my_stock.stockdata['MACD_X_NET_MACDSignal'] = my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] - my_stock.stockdata['MACD_X_BELOW_MACDSignal']
+                #signals = generate_signals(my_stock.stockdata["RSI"])
+                #signals_series = pd.Series(signals, index=my_stock.stockdata["RSI"].index)
+                #my_stock.stockdata['RSI_X_ABOVE_30'] = signals_series[signals_series == 1]
+                #my_stock.stockdata['RSI_X_BELOW_70'] = signals_series[signals_series == -1]
                 #my_stock.stockdata['MACD_DIFF_MACDSignal'] = scaler.fit_transform((my_stock.stockdata['MACD'] - my_stock.stockdata['MACDSignal']).values.reshape(-1, 1))
                 #my_stock.stockdata['TEMA5_DIFF_TEMA20'] = scaler.fit_transform((my_stock.stockdata['TEMA5'] - my_stock.stockdata['TEMA20']).values.reshape(-1, 1))
                 #my_stock.stockdata['TEMA20_DIFF_SMA50'] = scaler.fit_transform((my_stock.stockdata['TEMA20'] - my_stock.stockdata['SMA50']).values.reshape(-1, 1))

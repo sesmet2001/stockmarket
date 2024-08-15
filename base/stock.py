@@ -113,10 +113,8 @@ class Stock(Asset):
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
-            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.03,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
-            
-            fig.update_layout(width=1200, height=1500, title_x=0.5)
-            fig.update_layout(xaxis_rangeslider_visible=False)
+            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.05,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
+        
             
             # Row 1 Open Close
             fig.add_trace(
@@ -147,6 +145,20 @@ class Stock(Asset):
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey',opacity=0.2),
                 row=1, col=1
             )
+            macd_buy_index = self.plotdata[(self.plotdata['prevMACD'] < self.plotdata['prevMACDSignal']) & (self.plotdata['MACD'] >= self.plotdata['MACDSignal'])].index
+            print(macd_buy_index)
+            fig.add_trace(
+                go.Scatter(x=macd_buy_index,y=self.plotdata.loc[macd_buy_index,'Close'],mode='markers',marker=dict(symbol='triangle-up', size=15, color='chartreuse', line=dict(width=2, color='DarkSlateGrey')),name='Buy Signal'),
+                row=1, col=1
+            )
+            macd_sell_index = self.plotdata[(self.plotdata['prevMACD'] >= self.plotdata['prevMACDSignal']) & (self.plotdata['MACD'] < self.plotdata['MACDSignal'])].index
+            print(macd_sell_index)
+            fig.add_trace(
+                go.Scatter(x=macd_sell_index,y=self.plotdata.loc[macd_sell_index,'Close'],mode='markers',marker=dict(symbol='triangle-down', size=15, color='yellow', line=dict(width=2, color='DarkSlateGrey')),name='Sell Signal'),
+                row=1, col=1
+            )
+
+            #plt.plot(df.index[buy_signal], df['Close'][buy_signal], '^', markersize=10, color='g', lw=0, label='Buy Signal')
             print("row 1 printed")
             #fig.add_trace(
             #    go.Scatter(x=self.plotdata.index,y=self.plotdata['SL_Price'],mode='markers',name='Stop Loss',line_color='red',opacity=1),
@@ -195,6 +207,7 @@ class Stock(Asset):
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['RSI'],mode='lines',name='RSI',showlegend=False,marker={"color": "rgba(128,128,128,0.5)"}),
                 row=2, col=1
             )
+            #fig.update_layout(height=400)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=2, col=1)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=2, col=1)
             print("row 2 printed")
@@ -297,6 +310,19 @@ class Stock(Asset):
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="green")
             #for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
+            #fig.update_xaxes(fixedrange=True)
+            fig.update_layout(
+                yaxis2=dict(
+                    range=[0, 100]  # Set the min and max values for the y-axis
+                ),
+                margin=dict(l=0, r=0, t=20, b=20),  # Set margins
+                autosize=True,
+                width=1200,
+                height=1500,
+                title_x=0.5,
+                xaxis_rangeslider_visible=False,
+                xaxis=dict(showline=True, zeroline=False, range=[self.plotdata.index.min(), self.plotdata.index.max()]),
+            )
             print("before printing " + my_imagepath)
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido")
             scope = pio.kaleido.scope
