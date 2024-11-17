@@ -1,6 +1,6 @@
 import sqlite3
 import yahoo_fin.stock_info as si
-import yfinance as yf
+import yfinance as yfpip
 import pandas as pd
 import sqlite3
 import os
@@ -40,6 +40,21 @@ def main():
         pd_portfolio_tickers = pd.DataFrame({"Ticker": lst_portfolio_tickers})
         pd_portfolio_tickers.set_index(['Ticker'])
 
+        # Beursrally tickers
+        lst_beursrally_tickers = ["MMM","AALB.AS","ABI.BR","ABT","ABBV","ABN.AS","AC.PA","ACKB.BR","ACOMO.AS","ADBE",\
+                                 "AMD","ADYEN.AS","AED.BR","AGN.AS","AGS","AGFB.BR","AD.AS","AF.PA","AI.PA","ABNB",\
+                                 "AIR.PA","AKZA.AS","ALFEN.AS","BABA","ALLFG.AS","CDA.PA","GOOGL","ALO.PA","AMZN","AXP",\
+                                 "AMG","AMGN","BEL.BR","CACC.PA","MSE.MI","AUEM.L","ANX.PA","JPN.PA","ENER.MI","GOAI.PA",\
+                                 "LCWD.MI","APAM","AAPL","ARCAD.AS","MT","ARGX","AKE.PA","ARM","ASC","ASM",\
+                                 "ASML","ASRNL.AS","T","ATEB.BR","AVTX","CS.PA","0P00001B46.F","AZE.BR","BSGR.AS","BAMNB.AS",\
+                                 "BAR","GOLD","BFIT","BESI.AS","BEKB.BR","BRK.B","BYND","BB","BIIB","BIM.PA",\
+                                 "BTLS.BR","BIRK","0P00001BVE.F","0P00001AHF.F","0P00000S1P.F","GOOG","BNP.PA","0P00016F74.F","0P0000YSYV.F","0P00009GVS.F",\
+                                 "BA","BOL.PA","BON.PA","BKNG","EN.PA","BPOST.BR","BNB.BR","BREB.BR","AVGO","BRNL.AS",\
+                                 "CAP.PA","GOOG","GOOG","CPINV.BR","CCL","CA.PA","CAT","CFEB.BR","CVX","COMB.BR",\
+                                 "CSCO","C","CLARI.PA","CMCOM.AS","CMBT.BR","KO","COFB.BR","COIN","CL","COLR.BR"]
+        pd_beursrally_tickers = pd.DataFrame({"Ticker": lst_beursrally_tickers})
+        pd_beursrally_tickers.set_index(['Ticker'])
+
         # Precious metals
         lst_precious_metals_tickers = ["GC=F","SI=F","PA=F","PL=F"]
         pd_precious_metals_tickers = pd.DataFrame({"Ticker": lst_precious_metals_tickers})
@@ -66,7 +81,7 @@ def main():
         # pd_other_tickers.set_index(['Ticker'])
 
         # Concat and remove duplicates
-        pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers])
+        pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_portfolio_tickers, pd_beursrally_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers])
         pd_all_tickers = pd_all_tickers.drop_duplicates()
         pd_alltemp_tickers = pd_all_tickers[pd_all_tickers['Ticker'] != 'BRK.B']
         pd_final_tickers = pd_alltemp_tickers[pd_alltemp_tickers['Ticker'] != 'BF.B']
@@ -74,6 +89,8 @@ def main():
         print(pd_final_tickers)
 
         # Mark tickers
+        pd_final_tickers = pd_final_tickers.copy()
+
         for index, row in pd_final_tickers.iterrows():
             for my_ticker in lst_screener_tickers:
                 if my_ticker == row['Ticker']:
@@ -90,6 +107,9 @@ def main():
             for my_ticker in lst_portfolio_tickers:
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
+            for my_ticker in lst_beursrally_tickers:
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Beursrally"] = 1
             for my_ticker in lst_precious_metals_tickers:
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
