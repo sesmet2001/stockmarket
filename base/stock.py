@@ -113,8 +113,7 @@ class Stock(Asset):
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
-            fig = make_subplots(rows=4,cols=1,vertical_spacing = 0.05,row_heights=[0.55, 0.15, 0.15, 0.15],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume"))
-        
+            fig = make_subplots(rows=5,cols=1,vertical_spacing = 0.05,row_heights=[0.60, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "OBV", "Volume"))        
             
             # Row 1 Open Close
             fig.add_trace(
@@ -145,18 +144,16 @@ class Stock(Asset):
                 go.Scatter(x=self.plotdata.index,y=self.plotdata['BB_low'],mode='lines',name='BB lower',line_color='grey',opacity=0.2),
                 row=1, col=1
             )
-            macd_buy_index = self.plotdata[(self.plotdata['prevMACD'] < self.plotdata['prevMACDSignal']) & (self.plotdata['MACD'] >= self.plotdata['MACDSignal'])].index
-            print(macd_buy_index)
-            fig.add_trace(
-                go.Scatter(x=macd_buy_index,y=self.plotdata.loc[macd_buy_index,'Close'],mode='markers',marker=dict(symbol='triangle-up', size=15, color='chartreuse', line=dict(width=2, color='DarkSlateGrey')),name='Buy Signal'),
-                row=1, col=1
-            )
-            macd_sell_index = self.plotdata[(self.plotdata['prevMACD'] >= self.plotdata['prevMACDSignal']) & (self.plotdata['MACD'] < self.plotdata['MACDSignal'])].index
-            print(macd_sell_index)
-            fig.add_trace(
-                go.Scatter(x=macd_sell_index,y=self.plotdata.loc[macd_sell_index,'Close'],mode='markers',marker=dict(symbol='triangle-down', size=15, color='yellow', line=dict(width=2, color='DarkSlateGrey')),name='Sell Signal'),
-                row=1, col=1
-            )
+            #strat1_buy_index = self.plotdata[self.plotdata["STRAT1_BUY"] == 1].index
+            #fig.add_trace(
+            #    go.Scatter(x=strat1_buy_index,y=self.plotdata.loc[strat1_buy_index,'Close'],mode='markers',marker=dict(symbol='triangle-up', size=15, color='chartreuse', line=dict(width=2, color='DarkSlateGrey')),name='Buy Signal'),
+            #    row=1, col=1
+            #)
+            #strat1_sell_index = self.plotdata[self.plotdata["STRAT1_SELL"] == 1].index
+            #fig.add_trace(
+            #    go.Scatter(x=strat1_sell_index,y=self.plotdata.loc[strat1_sell_index,'Close'],mode='markers',marker=dict(symbol='triangle-down', size=15, color='yellow', line=dict(width=2, color='DarkSlateGrey')),name='Sell Signal'),
+            #    row=1, col=1
+            #)
 
             #plt.plot(df.index[buy_signal], df['Close'][buy_signal], '^', markersize=10, color='g', lw=0, label='Buy Signal')
             print("row 1 printed")
@@ -201,6 +198,21 @@ class Stock(Asset):
             #    go.Scatter(x = self.plotdata.index, y = self.plotdata['CLOSE_X_NET_SMA50'],mode='lines',name='SMA50 NET'),
             #    row=2, col=1
             #)
+
+            # Row 2 STRAT POS
+            #fig.add_trace(
+            #    go.Scatter(x=self.plotdata.index,y=self.plotdata['STRAT1_POSITION'],mode='lines',name='Strategy 1',showlegend=False,marker={"color": "rgba(128,128,128,0.5)"}),
+            #    row=2, col=1
+            #)            
+            #print("row 2 printed")
+
+            # Row 3 STRAT BUDGET
+            #fig.add_trace(
+            #    go.Scatter(x=self.plotdata.index,y=self.plotdata['STRAT1_BUDGET'],mode='lines',name='Strategy 1',showlegend=False,marker={"color": "rgba(128,128,128,0.5)"}),
+            #    row=3, col=1
+            #)            
+            #print("row 3 printed")
+
 
             # Row 2 RSI
             fig.add_trace(
@@ -281,17 +293,33 @@ class Stock(Asset):
             #    )
             #    colornbr = colornbr + 1
             
-            # Row 4 Volume
+
+            # Row 4 OBV
             fig.add_trace(
-                go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
+                go.Scatter(x = self.plotdata.index, y = self.plotdata['OBV'],mode='lines',name='OBV'),
                 row=4, col=1
             )
             print("row 4 printed")
-            # Row 10 OBV
+
+            # Row 6 Volume
+            fig.add_trace(
+                go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
+                row=5, col=1
+            )
+            print("row 5 printed")
+
+
+            ## Row 6 derivative
             #fig.add_trace(
-            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['OBV'],mode='lines',name='OBV'),
-            #    row=5, col=1
+            #    go.Scatter(x = self.plotdata.index, y = self.plotdata['MACD_slope'],name='MACD slope',marker={"color": "rgba(128,128,128,0.5)"}),
+            #    row=6, col=1
             #)
+            #print("row 6 printed")
+
+
+
+
+
 
 
            
@@ -312,9 +340,9 @@ class Stock(Asset):
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
             #fig.update_xaxes(fixedrange=True)
             fig.update_layout(
-                yaxis2=dict(
-                    range=[0, 100]  # Set the min and max values for the y-axis
-                ),
+                #yaxis2=dict(
+                #    range=[0, 100]  # Set the min and max values for the y-axis
+                #),
                 margin=dict(l=0, r=0, t=20, b=20),  # Set margins
                 autosize=True,
                 width=1200,
