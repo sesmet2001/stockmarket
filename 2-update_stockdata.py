@@ -58,7 +58,7 @@ def detect_trend_changes(series):
     pd.Series: A series of the same length, where 1 indicates an upward trend change (from decreasing to increasing),
                -1 indicates a downward trend change (from increasing to decreasing), and 0 indicates no change.
     """
-    # Calculate the first difference (discrete derivative)
+    #Calculate the first difference (discrete derivative)
     diff = series.diff()
 
     # Detect where the sign of the derivative changes
