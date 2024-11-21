@@ -107,8 +107,8 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    #my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
+    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    #my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
     cur_tickers.execute(my_ticker_query)    
     my_tickers_list = cur_tickers.fetchall()
     my_tickers_orig = [x[0] for x in my_tickers_list]
