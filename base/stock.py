@@ -13,11 +13,13 @@ import plotly.io as pio
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import time
+import yfinance as yf
 
 class Stock(Asset):
     def __init__(self, my_conn, my_ticker, my_startdate, my_enddate):
         self.type = "stock"
         self.ticker = my_ticker
+        self.company_name = yf.Ticker(my_ticker).info['longName']
         self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'",my_conn)
         self.stockdata.set_index("Date",inplace=True)
         #print(self.stockdata.head(10))
@@ -113,7 +115,7 @@ class Stock(Asset):
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return: " + str(round(self.plotdata['CumulativeReturn'].iloc[-1]))))
             #else:
             #    fig = make_subplots(rows=6,cols=1,vertical_spacing = 0.05,row_heights=[0.50, 0.10, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n Price ($)\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "Volume", "Position", "Return"))
-            fig = make_subplots(rows=5,cols=1,vertical_spacing = 0.05,row_heights=[0.60, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.ticker + "\n\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "OBV", "Volume"))        
+            fig = make_subplots(rows=5,cols=1,vertical_spacing = 0.05,row_heights=[0.60, 0.10, 0.10, 0.10, 0.10],subplot_titles=(self.company_name  + " (" + self.ticker + ") \n\n(" + datetime.today().strftime('%d/%m/%Y') + ")", "RSI", "MACD", "OBV", "Volume"))        
             
             # Row 1 Open Close
             fig.add_trace(
