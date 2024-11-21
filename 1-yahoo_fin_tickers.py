@@ -7,7 +7,7 @@ import os
 
 def main():
     try:
-        # Define variables
+        #  Define variables
         DB_PATH = os.getenv('DB_PATH')
         conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)

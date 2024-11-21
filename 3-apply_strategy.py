@@ -64,7 +64,7 @@ def main():
     #print(sys.path)
     pd.set_option('display.max_rows', None)
     
-    # DB CONNECTIONS #
+    #  DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
     conn_data = sqlite3.connect(DB_PATH + "/database/stockradar-lite-data.db")
     cur_data = conn_data.cursor()
