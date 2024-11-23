@@ -81,7 +81,7 @@ def main():
     my_plotrange = 100
     my_start = datetime(2021, 1, 1)
     my_strategy = "X_TEMA5_TEMA20"
-    yf.pdr_override() 
+    #yf.pdr_override() 
     cross_above = np.vectorize(cross_above_function)
     cross_below = np.vectorize(cross_below_function)
     print(sys.path)
