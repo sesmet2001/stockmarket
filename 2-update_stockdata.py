@@ -107,19 +107,20 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
-    #my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
-    cur_tickers.execute(my_ticker_query)    
-    my_tickers_list = cur_tickers.fetchall()
-    my_tickers_orig = [x[0] for x in my_tickers_list]
-    my_tickers = [s.replace('', '') for s in my_tickers_orig]
+    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
+    my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
+    my_tickers.set_index('Ticker', inplace=True)
+    print(my_tickers)
+    #my_tickers_orig = [x[0] for x in my_tickers_list]
+    #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
     #my_tickers = [s.replace('.', '-') for s in my_tickers_orig]
     #my_tickers = [s.replace('VUSA-AS', 'VUSA.AS') for s in my_tickers]
     #my_tickers = ["BABA","CRWD"]
 
 
     # DOWNLOAD DATA IN CHUNKS #
-    print("Number of tickers: " + str(len(my_tickers)))
+    #print("Number of tickers: " + str(len(my_tickers[0])))
     print("Stock data from " + str(my_start) + " until " + str(my_end))
     chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
     try:
@@ -149,9 +150,10 @@ def main():
         pass
     
     #print("Calculate Features:")
-    for my_ticker in my_tickers:
+    for my_ticker,my_company in my_tickers.iterrows():
         try:
-            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
+            print(my_ticker + " " + my_company)
+            my_stock = Stock(conn_data,my_ticker,my_company, my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 #print(my_stock.ticker)
                 my_stock.dropna()
