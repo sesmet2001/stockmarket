@@ -70,8 +70,8 @@ def main():
                                  "EVS.BR","EXM.BR","EXO.AS","XOM","FAGR.BR","FAST.AS","-------","-------","-------","-------",\
                                  "------","FLOW.AS","FLUX.BR","FFARM.AS","----------","0P0000FTZO.F","XQ1Z.F","FUR.AS","0P0000W76V.F","GLPG",\
                                  "GME","GBLB.BR","GE","GEN","GM","GNFT","GILD","GIMB.BR","0P00001D6S.F","----------",\
-                                 "GS","0P00000BFO.F","-------","---------","GREEN.BR","HAL.AS","HEIJM.AS","HEIA.AS","RMS.AS","HD",\
-                                 "HOMI.BR","HON","0P0000191J.F","HYL.BR","IBAB.BR","ICMD.AS","NK.PA","IMMO.BR","INGA.AS","INPST.AS",\
+                                 "GS","0P00000BFO.F","-------","---------","GREEN.BR","HAL.AS","HEIJM.AS","HEIA.AS","------","HD",\
+                                 "HOMI.BR","HON","0P0000191J.F","HYL.BR","IBAB.BR","-----------","NK.PA","IMMO.BR","INGA.AS","INPST.AS",\
                                  "INTC","IBM","0P00005Z2C.F","----------","----------","IAEX.AS","---------","---------","IEMM.AS","ITOS",\
                                  "--------","JDEP.AS","JEN.BR","JNJ","JPM","-----","-----","TKWY.AS","KBC.BR","KBCA.BR",\
                                  "KENDR.AS","KER.PA","KIN.BR" ]
@@ -79,22 +79,22 @@ def main():
         lst_beursrally_tickers = [item for item in lst_beursrally_tickers_all if "-" not in item]
         print(lst_beursrally_tickers)
 
-        #lst_beursrally_names = []
-        #for my_ticker in lst_beursrally_tickers:
-        #    my_company = yf.Ticker(my_ticker).info.get("longName", "Company name not available")
-        #    print(my_company)
-        #    lst_beursrally_names.append(my_company)
-        #print(lst_beursrally_names)
-        lst_beursrally_names = ['3M Company', 'Aalberts N.V.', 'Anheuser-Busch InBev SA/NV', 'Abbott Laboratories', 'AbbVie Inc.', 'ABN AMRO Bank N.V.', 'Accor SA', 'Ackermans & Van Haaren NV', 'Acomo N.V.', 'Adobe Inc.',\
-                                'Advanced Micro Devices, Inc.', 'Adyen N.V.', 'Aedifica NV/SA', 'Aegon Ltd.', 'PlayAGS, Inc.', 'Agfa-Gevaert NV', 'Koninklijke Ahold Delhaize N.V.', 'Air France-KLM SA', "L'Air Liquide S.A.", 'Airbnb, Inc.', \
-                                'Airbus SE', 'Akzo Nobel N.V.', 'Alfen N.V.', 'Alibaba Group Holding Limited', 'Allfunds Group plc', 'Compagnie des Alpes SA', 'Alphabet Inc.', 'Alstom SA', 'Amazon.com, Inc.', 'American Express Company',\
-                                'Affiliated Managers Group, Inc.', 'Amgen Inc.', 'Amundi BEL 20 UCITS ETF Dist', 'Amundi CAC 40 UCITS ETF Acc', 'Amundi EURO STOXX 50 II UCITS ETF Acc', 'Amundi Index Solutions - Amundi MSCI Emerging Markets UCITS ETF-C USD', 'Amundi Index Solutions - Amundi Nasdaq-100 ETF-C EUR', 'Amundi Japan TOPIX II UCITS ETF EUR Dist', 'Amundi MSCI New Energy ESG Screened UCITS ETF Dist', 'Amundi MSCI Robotics & AI ESG Screened UCITS ETF', \
-                                'Amundi MSCI World V UCITS ETF', 'Artisan Partners Asset Management Inc.', 'Apple Inc.', 'Arcadis NV', 'ArcelorMittal S.A.', 'argenx SE', 'Arkema S.A.', 'Arm Holdings plc', 'Ardmore Shipping Corporation', 'Avino Silver & Gold Mines Ltd.',\
-                                'ASML Holding N.V.', 'ASR Nederland N.V.', 'AT&T Inc.', 'Atenor SA', 'Avalo Therapeutics, Inc.', 'AXA SA', 'AXAWF Switzerland Eq A Cap EUR', 'Azelis Group NV', 'B&S Group S.A.', 'Koninklijke BAM Groep nv', \
-                                'GraniteShares Gold Trust', 'Barrick Gold Corporation', 'Global X Health & Wellness ETF', 'BE Semiconductor Industries N.V.', 'NV Bekaert SA', 'Berkshire Hathaway', 'Beyond Meat, Inc.', 'BlackBerry Limited', 'Biogen Inc.', 'bioMérieux S.A.',\
-                                'Biotalys NV', 'Birkenstock Holding plc', 'BL-Global Flexible EUR', 'BGF Continental Eurp Flex A2 EUR', 'BGF ESG Multi-Asset A2 EUR', 'Alphabet Inc.', 'BNP Paribas SA', 'BNP Paribas Aqua C C', 'BNP Paribas Disrpt Tech Cl C', 'BNY Mellon Brazil Equity EUR A Acc', \
-                                'The Boeing Company', 'Bolloré SE', 'Bonduelle SCA', 'Booking Holdings Inc.', 'Bouygues SA', 'bpost NV/SA', 'Banque nationale de Belgique SA', 'Brederode SA', 'Broadcom Inc.', 'Brunel International N.V.', 'Capgemini SE', 'Alphabet Inc.', 'Alphabet Inc.', 'Care Property Invest NV', 'Carnival Corporation & plc', 'Carrefour SA', 'Caterpillar Inc.', "Compagnie d'Entreprises CFE SA", 'Chevron Corporation', 'Compagnie du Bois Sauvage S.A.',\
-                                'Cisco Systems, Inc.', 'Citigroup Inc.', 'Clariane SE', 'CM.com N.V.', 'Cmb.Tech NV', 'The Coca-Cola Company', 'Cofinimmo SA', 'Coinbase Global, Inc.', 'Colgate-Palmolive Company', 'Colruyt Group N.V.']
+        lst_beursrally_names = []
+        for my_ticker in lst_beursrally_tickers:
+            my_company = yf.Ticker(my_ticker).info.get("longName", "Company name not available")
+            print(my_company)
+            lst_beursrally_names.append(my_company)
+        print(lst_beursrally_names)
+        #lst_beursrally_names = ['3M Company', 'Aalberts N.V.', 'Anheuser-Busch InBev SA/NV', 'Abbott Laboratories', 'AbbVie Inc.', 'ABN AMRO Bank N.V.', 'Accor SA', 'Ackermans & Van Haaren NV', 'Acomo N.V.', 'Adobe Inc.',\
+        #                        'Advanced Micro Devices, Inc.', 'Adyen N.V.', 'Aedifica NV/SA', 'Aegon Ltd.', 'PlayAGS, Inc.', 'Agfa-Gevaert NV', 'Koninklijke Ahold Delhaize N.V.', 'Air France-KLM SA', "L'Air Liquide S.A.", 'Airbnb, Inc.', \
+        #                        'Airbus SE', 'Akzo Nobel N.V.', 'Alfen N.V.', 'Alibaba Group Holding Limited', 'Allfunds Group plc', 'Compagnie des Alpes SA', 'Alphabet Inc.', 'Alstom SA', 'Amazon.com, Inc.', 'American Express Company',\
+        #                        'Affiliated Managers Group, Inc.', 'Amgen Inc.', 'Amundi BEL 20 UCITS ETF Dist', 'Amundi CAC 40 UCITS ETF Acc', 'Amundi EURO STOXX 50 II UCITS ETF Acc', 'Amundi Index Solutions - Amundi MSCI Emerging Markets UCITS ETF-C USD', 'Amundi Index Solutions - Amundi Nasdaq-100 ETF-C EUR', 'Amundi Japan TOPIX II UCITS ETF EUR Dist', 'Amundi MSCI New Energy ESG Screened UCITS ETF Dist', 'Amundi MSCI Robotics & AI ESG Screened UCITS ETF', \
+        #                        'Amundi MSCI World V UCITS ETF', 'Artisan Partners Asset Management Inc.', 'Apple Inc.', 'Arcadis NV', 'ArcelorMittal S.A.', 'argenx SE', 'Arkema S.A.', 'Arm Holdings plc', 'Ardmore Shipping Corporation', 'Avino Silver & Gold Mines Ltd.',\
+        #                        'ASML Holding N.V.', 'ASR Nederland N.V.', 'AT&T Inc.', 'Atenor SA', 'Avalo Therapeutics, Inc.', 'AXA SA', 'AXAWF Switzerland Eq A Cap EUR', 'Azelis Group NV', 'B&S Group S.A.', 'Koninklijke BAM Groep nv', \
+        #                        'GraniteShares Gold Trust', 'Barrick Gold Corporation', 'Global X Health & Wellness ETF', 'BE Semiconductor Industries N.V.', 'NV Bekaert SA', 'Berkshire Hathaway', 'Beyond Meat, Inc.', 'BlackBerry Limited', 'Biogen Inc.', 'bioMérieux S.A.',\
+        #                        'Biotalys NV', 'Birkenstock Holding plc', 'BL-Global Flexible EUR', 'BGF Continental Eurp Flex A2 EUR', 'BGF ESG Multi-Asset A2 EUR', 'Alphabet Inc.', 'BNP Paribas SA', 'BNP Paribas Aqua C C', 'BNP Paribas Disrpt Tech Cl C', 'BNY Mellon Brazil Equity EUR A Acc', \
+        #                        'The Boeing Company', 'Bolloré SE', 'Bonduelle SCA', 'Booking Holdings Inc.', 'Bouygues SA', 'bpost NV/SA', 'Banque nationale de Belgique SA', 'Brederode SA', 'Broadcom Inc.', 'Brunel International N.V.', 'Capgemini SE', 'Alphabet Inc.', 'Alphabet Inc.', 'Care Property Invest NV', 'Carnival Corporation & plc', 'Carrefour SA', 'Caterpillar Inc.', "Compagnie d'Entreprises CFE SA", 'Chevron Corporation', 'Compagnie du Bois Sauvage S.A.',\
+        #                        'Cisco Systems, Inc.', 'Citigroup Inc.', 'Clariane SE', 'CM.com N.V.', 'Cmb.Tech NV', 'The Coca-Cola Company', 'Cofinimmo SA', 'Coinbase Global, Inc.', 'Colgate-Palmolive Company', 'Colruyt Group N.V.']
         dict_beursrally_tickers = {
             "Ticker": lst_beursrally_tickers,
             "Company": lst_beursrally_names
