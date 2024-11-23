@@ -28,7 +28,7 @@ def main():
     my_plotrange = 200
     my_strategies = ["Strat1"]
     my_colors = ["red","green","blue"]
-    yf.pdr_override() 
+    #yf.pdr_override() 
     print(sys.path)
     
     # DB CONNECTIONS #
