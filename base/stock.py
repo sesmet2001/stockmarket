@@ -17,10 +17,10 @@ import yfinance as yf
 import yahoo_fin.stock_info as si
 
 class Stock(Asset):
-    def __init__(self, my_conn, my_ticker, my_startdate, my_enddate):
+    def __init__(self, my_conn, my_ticker, my_company, my_startdate, my_enddate):
         self.type = "stock"
         self.ticker = my_ticker
-        self.company_name = yf.Ticker(my_ticker).info.get("longName", "Company name not available")
+        self.company_name = my_company
         self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'",my_conn)
         self.stockdata.set_index("Date",inplace=True)
         #print(self.stockdata.head(10))
