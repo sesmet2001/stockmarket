@@ -64,11 +64,11 @@ def main():
                                  "BA","BOL.PA","BON.PA","BKNG","EN.PA","BPOST.BR","BNB.BR","BREB.BR","AVGO","BRNL.AS",\
                                  "CAP.PA","GOOG","GOOG","CPINV.BR","CCL","CA.PA","CAT","CFEB.BR","CVX","COMB.BR",\
                                  "CSCO","C","CLARI.PA","CMCOM.AS","CMBT.BR","KO","COFB.BR","COIN","CL","COLR.BR",\
-                                 "CMCSA","0P00000LM7.F","CRBN.AS","ACA.PA","XRZD.F","CTPNV.AS","BN.PA","DSY.PA","DECB.BR","DEME.BR",\
-                                 "DIE.BR","0P0000XTFD.F","Dow","0P00000HCB.F","DSFIR.AS","-----","EBAY","EBUS.AS","ECONB.BR","EDEN.PA",\
+                                 "CMCSA","0P00000LM7.F","CRBN.AS","ACA.PA","--------","CTPNV.AS","BN.PA","DSY.PA","DECB.BR","DEME.BR",\
+                                 "DIE.BR","0P0000XTFD.F","----------","0P00000HCB.F","DSFIR.AS","-----","EBAY","EBUS.AS","ECONB.BR","EDEN.PA",\
                                  "EKOP.BR","EA","LLY","ELI.BR","ENGI.PA","EL.PA","RF.PA","ECMPA.AS","ERF.PA","ENX.PA",\
                                  "EVS.BR","EXM.BR","EXO.AS","XOM","FAGR.BR","FAST.AS","-------","-------","-------","-------",\
-                                 "------","FLOW.AS","FLUX.BR","FFARM.AS","----------","0P0000FTZO.F","XQ1Z.F","FUR.AS","0P0000W76V.F","GLPG",\
+                                 "------","FLOW.AS","FLUX.BR","FFARM.AS","----------","0P0000FTZO.F","----","FUR.AS","0P0000W76V.F","GLPG",\
                                  "GME","GBLB.BR","GE","GEN","GM","GNFT","GILD","GIMB.BR","0P00001D6S.F","----------",\
                                  "GS","0P00000BFO.F","-------","---------","GREEN.BR","HAL.AS","HEIJM.AS","HEIA.AS","------","HD",\
                                  "HOMI.BR","HON","0P0000191J.F","HYL.BR","IBAB.BR","-----------","NK.PA","IMMO.BR","INGA.AS","INPST.AS",\
@@ -81,7 +81,7 @@ def main():
 
         lst_beursrally_names = []
         for my_ticker in lst_beursrally_tickers:
-            my_company = yf.Ticker(my_ticker).info.get("longName", "Company name not available")
+            my_company = yf.Ticker(my_ticker).info.get("longName", "no name available")
             print(my_company)
             lst_beursrally_names.append(my_company)
         print(lst_beursrally_names)

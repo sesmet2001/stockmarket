@@ -87,7 +87,7 @@ def main():
     print(sys.path)
     pd.set_option('display.max_rows', 10)
     scaler = MinMaxScaler(feature_range=(-1, 1))
-    #pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
     #np.set_printoptions(threshold=np.inf)
@@ -111,7 +111,7 @@ def main():
     my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
     my_tickers.set_index('Ticker', inplace=True)
-    print(my_tickers)
+    #print(my_tickers)
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
     #my_tickers = [s.replace('.', '-') for s in my_tickers_orig]
@@ -122,15 +122,17 @@ def main():
     # DOWNLOAD DATA IN CHUNKS #
     #print("Number of tickers: " + str(len(my_tickers[0])))
     print("Stock data from " + str(my_start) + " until " + str(my_end))
-    chunks = [my_tickers[i:i + chunksize] for i in range(0, len(my_tickers), chunksize)]
+    chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
+    #print("chunks: " + str(chunks))
     try:
         for chunk in chunks:
+            
             #print(str(chunk) + "\n")
+            #print(" ".join(chunk))
             data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
             #print(data.describe())
             #print(chunk)
             for my_ticker in chunk:
-                #print(my_ticker)
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
                 #my_ticker_df["Ticker"] = my_ticker
@@ -152,7 +154,7 @@ def main():
     #print("Calculate Features:")
     for my_ticker,my_company in my_tickers.iterrows():
         try:
-            print(my_ticker + " " + my_company)
+            #print(my_ticker + " " + my_company)
             my_stock = Stock(conn_data,my_ticker,my_company, my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 #print(my_stock.ticker)
