@@ -53,7 +53,7 @@ def main():
         print("nasdaq tickers done")
 
         # Beursrally tickers
-        lst_beursrally_tickers = ["MMM","AALB.AS","ABI.BR","ABT","ABBV","ABN.AS","AC.PA","ACKB.BR","ACOMO.AS","ADBE",\
+        lst_beursrally_tickers_all = ["MMM","AALB.AS","ABI.BR","ABT","ABBV","ABN.AS","AC.PA","ACKB.BR","ACOMO.AS","ADBE",\
                                  "AMD","ADYEN.AS","AED.BR","AGN.AS","AGS","AGFB.BR","AD.AS","AF.PA","AI.PA","ABNB",\
                                  "AIR.PA","AKZA.AS","ALFEN.AS","BABA","ALLFG.AS","CDA.PA","GOOGL","ALO.PA","AMZN","AXP",\
                                  "AMG","AMGN","BEL.BR","CACC.PA","MSE.MI","AUEM.L","ANX.PA","JPN.PA","ENER.MI","GOAI.PA",\
@@ -63,7 +63,22 @@ def main():
                                  "BTLS.BR","BIRK","0P00001BVE.F","0P00001AHF.F","0P00000S1P.F","GOOG","BNP.PA","0P00016F74.F","0P0000YSYV.F","0P00009GVS.F",\
                                  "BA","BOL.PA","BON.PA","BKNG","EN.PA","BPOST.BR","BNB.BR","BREB.BR","AVGO","BRNL.AS",\
                                  "CAP.PA","GOOG","GOOG","CPINV.BR","CCL","CA.PA","CAT","CFEB.BR","CVX","COMB.BR",\
-                                 "CSCO","C","CLARI.PA","CMCOM.AS","CMBT.BR","KO","COFB.BR","COIN","CL","COLR.BR"]
+                                 "CSCO","C","CLARI.PA","CMCOM.AS","CMBT.BR","KO","COFB.BR","COIN","CL","COLR.BR",\
+                                 "CMCSA","0P00000LM7.F","CRBN.AS","ACA.PA","XRZD.F","CTPNV.AS","BN.PA","DSY.PA","DECB.BR","DEME.BR",\
+                                 "DIE.BR","0P0000XTFD.F","Dow","0P00000HCB.F","DSFIR.AS","-----","EBAY","EBUS.AS","ECONB.BR","EDEN.PA",\
+                                 "EKOP.BR","EA","LLY","ELI.BR","ENGI.PA","EL.PA","RF.PA","ECMPA.AS","ERF.PA","ENX.PA",\
+                                 "EVS.BR","EXM.BR","EXO.AS","XOM","FAGR.BR","FAST.AS","-------","-------","-------","-------",\
+                                 "------","FLOW.AS","FLUX.BR","FFARM.AS","----------","0P0000FTZO.F","XQ1Z.F","FUR.AS","0P0000W76V.F","GLPG",\
+                                 "GME","GBLB.BR","GE","GEN","GM","GNFT","GILD","GIMB.BR","0P00001D6S.F","----------",\
+                                 "GS","0P00000BFO.F","-------","---------","GREEN.BR","HAL.AS","HEIJM.AS","HEIA.AS","RMS.AS","HD",\
+                                 "HOMI.BR","HON","0P0000191J.F","HYL.BR","IBAB.BR","ICMD.AS","NK.PA","IMMO.BR","INGA.AS","INPST.AS",\
+                                 "INTC","IBM","0P00005Z2C.F","----------","----------","IAEX.AS","---------","---------","IEMM.AS","ITOS",\
+                                 "--------","JDEP.AS","JEN.BR","JNJ","JPM","-----","-----","TKWY.AS","KBC.BR","KBCA.BR",\
+                                 "KENDR.AS","KER.PA","KIN.BR" ]
+        print(lst_beursrally_tickers_all)
+        lst_beursrally_tickers = [item for item in lst_beursrally_tickers_all if "-" not in item]
+        print(lst_beursrally_tickers)
+
         #lst_beursrally_names = []
         #for my_ticker in lst_beursrally_tickers:
         #    my_company = yf.Ticker(my_ticker).info.get("longName", "Company name not available")
