@@ -107,15 +107,19 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) LIMIT 1500'    
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
-    my_tickers.set_index('Ticker', inplace=True)
+    
     #print(my_tickers)
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
-    #my_tickers = [s.replace('.', '-') for s in my_tickers_orig]
-    #my_tickers = [s.replace('VUSA-AS', 'VUSA.AS') for s in my_tickers]
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('.', '-')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
+    my_tickers.set_index('Ticker', inplace=True)
     #my_tickers = ["BABA","CRWD"]
 
 
