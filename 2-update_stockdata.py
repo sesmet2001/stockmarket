@@ -1,6 +1,7 @@
 from pandas_datareader.data import DataReader
 import pandas as pd
 from datetime import datetime, timedelta
+import time
 import yfinance as yf
 import timeit
 import sqlite3
@@ -114,28 +115,31 @@ def main():
     #print(my_tickers)
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('.', '-')
+    my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
     my_tickers.set_index('Ticker', inplace=True)
+    #print(my_tickers)
     #my_tickers = ["BABA","CRWD"]
 
-
+    #print(my_tickers)
     # DOWNLOAD DATA IN CHUNKS #
     #print("Number of tickers: " + str(len(my_tickers[0])))
     print("Stock data from " + str(my_start) + " until " + str(my_end))
-    chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
+    chunks = [my_tickers[i:i + chunksize - 1].index for i in range(0, len(my_tickers), chunksize)]
     #print("chunks: " + str(chunks))
     try:
         for chunk in chunks:
             
-            #print(str(chunk) + "\n")
+            print(str(chunk) + "\n")
             #print(" ".join(chunk))
             data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
             #print(data.describe())
             #print(chunk)
+            #print(data)
             for my_ticker in chunk:
                 my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
                 my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
@@ -144,6 +148,7 @@ def main():
                     my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
                 else:
                     print(my_ticker + " has no data.")
+            time.sleep(2) 
     except Exception as e:
         # Get the exception information including the line number
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -155,6 +160,7 @@ def main():
         print(f"Exception occurred on line {line_number}: {e}")
         pass
     
+    #print(my_tickers.iterrows())
     #print("Calculate Features:")
     for my_ticker,my_company in my_tickers.iterrows():
         try:
