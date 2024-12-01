@@ -115,10 +115,10 @@ def main():
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
     #my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
     my_tickers.set_index('Ticker', inplace=True)
     #print(my_tickers)
