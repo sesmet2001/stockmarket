@@ -140,6 +140,16 @@ def main():
         pd_beursrally_tickers.set_index(['Ticker'])
         print("beursrally tickers done")
 
+        # Portfolio
+        dict_portfolio_tickers = {
+            "Ticker": [ "ASML","MSTR","COIN","NVDA","SMCI","AMZN","PLTR" ],
+            "Company":  [ "ASML","Microstrategy","Coinbase Global","Nvidia","Super Micro Computer","Amazon","Palantir" ]
+        }
+        pd_portfolio_tickers =  pd.DataFrame.from_dict(dict_portfolio_tickers) 
+        lst_portfolio_tickers = pd_portfolio_tickers['Ticker'] 
+        pd_portfolio_tickers.set_index(['Ticker'])
+        print("portfolio tickers done")
+
         # Precious metals
         dict_precious_metals_tickers = {
             "Ticker": [ "GC=F","SI=F","PA=F","PL=F" ],
@@ -196,7 +206,7 @@ def main():
 
         # Concat and remove duplicates
         print("before concat")
-        pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
+        pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
         print("after concat")
         pd_all_tickers = pd_all_tickers.drop_duplicates(subset='Ticker')
         pd_alltemp_tickers = pd_all_tickers[pd_all_tickers['Ticker'] != 'BRK.B']
@@ -229,6 +239,10 @@ def main():
                 #print("loop beursrally " + my_ticker)
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Beursrally"] = 1
+            for my_ticker in lst_portfolio_tickers:
+                #print("loop beursrally " + my_ticker)
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
             for my_ticker in lst_precious_metals_tickers:
                 #print("loop metals)")
                 if my_ticker == row['Ticker']:
