@@ -14,7 +14,6 @@ from base.stock import Stock
 import socket
 from patterns.cross import Cross
 import traceback
-import vectorbt as vbt
 from backtesting.lib import crossover
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
@@ -75,7 +74,7 @@ def main():
     
     
     # PARAMETERS #
-    chunksize = 100
+    chunksize = 10
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
@@ -108,18 +107,18 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
-    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
+    #my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Beursrally == 1'    
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
     
     #print(my_tickers)
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
-    my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
+    #my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
     my_tickers.set_index('Ticker', inplace=True)
     #print(my_tickers)
@@ -129,12 +128,12 @@ def main():
     # DOWNLOAD DATA IN CHUNKS #
     #print("Number of tickers: " + str(len(my_tickers[0])))
     print("Stock data from " + str(my_start) + " until " + str(my_end))
-    chunks = [my_tickers[i:i + chunksize - 1].index for i in range(0, len(my_tickers), chunksize)]
+    chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
     #print("chunks: " + str(chunks))
     try:
         for chunk in chunks:
             
-            print(str(chunk) + "\n")
+            #print(str(chunk) + "\n")
             #print(" ".join(chunk))
             data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
             #print(data.describe())
@@ -148,7 +147,7 @@ def main():
                     my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
                 else:
                     print(my_ticker + " has no data.")
-            time.sleep(2) 
+            time.sleep(1) 
     except Exception as e:
         # Get the exception information including the line number
         exc_type, exc_obj, exc_tb = sys.exc_info()
