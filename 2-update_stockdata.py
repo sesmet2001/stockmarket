@@ -74,7 +74,7 @@ def main():
     
     
     # PARAMETERS #
-    chunksize = 10
+    chunksize = 1000
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
@@ -114,7 +114,7 @@ def main():
     #print(my_tickers)
     #my_tickers_orig = [x[0] for x in my_tickers_list]
     #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
-    #my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
+    my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
