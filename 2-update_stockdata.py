@@ -74,7 +74,7 @@ def main():
     
     
     # PARAMETERS #
-    chunksize = 1000
+    chunksize = 100
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
@@ -147,7 +147,7 @@ def main():
                     my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
                 else:
                     print(my_ticker + " has no data.")
-            time.sleep(1) 
+            time.sleep(70) 
     except Exception as e:
         # Get the exception information including the line number
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -192,6 +192,7 @@ def main():
                 my_stock.stockdata["TEMA50"] = ta.TEMA(my_stock.stockdata['Close'],50)
                 my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
                 my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=10)
+                #my_stock.stockdata["ADX"] = ta.ADX()
                 my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
                 my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
                 my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change()
