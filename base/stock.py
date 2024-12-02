@@ -21,7 +21,9 @@ class Stock(Asset):
         self.type = "stock"
         self.ticker = my_ticker
         self.company_name = my_company
-        self.stockdata = pd.read_sql_query("SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'",my_conn)
+        my_sql = "SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'"
+        #print(my_sql)
+        self.stockdata = pd.read_sql_query(my_sql,my_conn)
         self.stockdata.set_index("Date",inplace=True)
         #print(self.stockdata.head(10))
 
@@ -159,7 +161,7 @@ class Stock(Asset):
             #)
 
             #plt.plot(df.index[buy_signal], df['Close'][buy_signal], '^', markersize=10, color='g', lw=0, label='Buy Signal')
-            print("row 1 printed")
+            #print("row 1 printed")
             #fig.add_trace(
             #    go.Scatter(x=self.plotdata.index,y=self.plotdata['SL_Price'],mode='markers',name='Stop Loss',line_color='red',opacity=1),
             #    row=1, col=1
@@ -225,7 +227,7 @@ class Stock(Asset):
             #fig.update_layout(height=400)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=70,x1=self.plotdata.index.max(),y1=70,line=dict(color='Red'),row=2, col=1)
             fig.add_shape(type='line',x0=self.plotdata.index.min(),y0=30,x1=self.plotdata.index.max(),y1=30,line=dict(color='Green'),row=2, col=1)
-            print("row 2 printed")
+            #print("row 2 printed")
             # Row 4 RSI Signal 
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['RSI_X_BELOW_70'],mode='lines',line_shape='spline',name='RSI BELOW 60'),
@@ -249,7 +251,7 @@ class Stock(Asset):
                 go.Bar(x = self.plotdata.index, y = self.plotdata['MACDHist'],name='MACD Histogram',marker={"color": "rgba(128,128,128,0.5)"}),
                 row=3, col=1
             )
-            print("row 3 printed")
+            #print("row 3 printed")
             # Row 6 MACD Signal
             #fig.add_trace(
             #    go.Scatter(x = self.plotdata.index, y = -self.plotdata['MACD_X_BELOW_MACDSignal'],mode='lines',line_shape='spline',name='MACD ABOVE Signal'),
@@ -302,14 +304,14 @@ class Stock(Asset):
                 go.Scatter(x = self.plotdata.index, y = self.plotdata['OBV'],mode='lines',name='OBV'),
                 row=4, col=1
             )
-            print("row 4 printed")
+            #print("row 4 printed")
 
             # Row 6 Volume
             fig.add_trace(
                 go.Bar(x = self.plotdata.index, y = self.plotdata['Volume'],name='Volume',marker={"color": "rgba(128,128,128,0.5)"}),
                 row=5, col=1
             )
-            print("row 5 printed")
+            #print("row 5 printed")
 
 
             ## Row 6 derivative
@@ -354,16 +356,16 @@ class Stock(Asset):
                 xaxis_rangeslider_visible=False,
                 xaxis=dict(showline=True, zeroline=False, range=[self.plotdata.index.min(), self.plotdata.index.max()]),
             )
-            print("before printing " + my_imagepath)
+            #print("before printing " + my_imagepath)
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido")
             scope = pio.kaleido.scope
-            print(scope._std_error.getvalue().decode())
-            print("after printing")
+            #print(scope._std_error.getvalue().decode())
+            #print("after printing")
             end_time = time.time()
 
             # Calculate total time taken
             elapsed_time = end_time - start_time
-            print(f"Execution time: {elapsed_time} seconds")
+            #print(f"Execution time: {elapsed_time} seconds")
             return 1
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
