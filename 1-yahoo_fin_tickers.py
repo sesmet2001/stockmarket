@@ -33,9 +33,10 @@ def main():
         #pd_sp500_tickers_full = si.tickers_sp500(include_company_data = True)
         #pd_sp500_tickers = pd_sp500_tickers_full[['Symbol','Security']]
         lst_sp500_tickers = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
+        #print(lst_sp500_tickers)
         dict_sp500_tickers = {
             "Ticker": lst_sp500_tickers.Symbol,
-            "Company": lst_sp500_tickers.Security
+            "Company": lst_sp500_tickers.Company
         }
         lst_sp500_tickers = lst_sp500_tickers['Symbol']
         pd_sp500_tickers = pd.DataFrame.from_dict(dict_sp500_tickers) 
