@@ -74,7 +74,8 @@ def main():
     
     
     # PARAMETERS #
-    chunksize = 100
+    chunksize = 1
+    max_retries = 3
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
@@ -107,7 +108,7 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) LIMIT 10'    
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Beursrally == 1 OR Portfolio == 1)'    
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
     
@@ -130,34 +131,39 @@ def main():
     print("Stock data from " + str(my_start) + " until " + str(my_end))
     chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
     #print("chunks: " + str(chunks))
-    try:
-        for chunk in chunks:
+    for chunk in chunks:
             
-            #print(str(chunk) + "\n")
-            #print(" ".join(chunk))
-            data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False)
-            #print(data.describe())
-            #print(chunk)
-            #print(data)
-            for my_ticker in chunk:
-                my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
-                my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
-                #my_ticker_df["Ticker"] = my_ticker
-                if not pd.isnull(my_ticker_df['AdjClose']).all():
-                    my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
-                else:
-                    print(my_ticker + " has no data.")
-            time.sleep(70) 
-    except Exception as e:
-        # Get the exception information including the line number
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        
-        # Extract the line number
-        line_number = exc_tb.tb_lineno
-        
-        # Print the exception message along with the line number
-        print(f"Exception occurred on line {line_number}: {e}")
-        pass
+        #print(str(chunk) + "\n")
+        print(" ".join(chunk))
+        retry_count = 0
+  
+        while retry_count < max_retries:
+            try:
+                data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False,)
+                break
+                #print(data)
+            except Exception as e:          
+                # Print the exception message along with the line number
+                print(f"Exception occurred on line {line_number}: {e}")
+                retry_count += 1
+                print(f"Error with {chunk}, retry {retry_count}: {e}")
+                time.sleep(5)  # Wait before retrying
+        if retry_count == max_retries:
+            print(f"Failed to fetch data for {chunk} after {max_retries} retries.")
+
+        #print(data.describe())
+        #print(chunk)
+        #print(data)
+        for my_ticker in chunk:
+            my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
+            my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
+            #my_ticker_df["Ticker"] = my_ticker
+            if not pd.isnull(my_ticker_df['AdjClose']).all():
+                my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
+            else:
+                print(my_ticker + " has no data.")
+        time.sleep(1)  
+    
     
     #print(my_tickers.iterrows())
     #print("Calculate Features:")
