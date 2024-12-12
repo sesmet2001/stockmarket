@@ -15,7 +15,6 @@ from base.stock import Stock
 import socket
 from patterns.cross import Cross
 import traceback
-import vectorbt as vbt
 from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
 
@@ -25,10 +24,10 @@ def main():
     MACD_FAST = 12
     MACD_SLOW = 26
     MACD_SIGNAL = 9
-    my_plotrange = 100
+    my_plotrange = 200
     my_strategies = ["Strat1"]
     my_colors = ["red","green","blue"]
-    yf.pdr_override() 
+    #yf.pdr_override() 
     print(sys.path)
     
     # DB CONNECTIONS #
@@ -38,7 +37,7 @@ def main():
     conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
     cur_tickers = conn_tickers.cursor()
 
-    my_start = datetime(2020, 1, 1)
+    my_start = datetime(2021, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
@@ -47,17 +46,22 @@ def main():
     # LOAD TICKER DATA #
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE (Screener == 1 OR SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'
-    #my_ticker_query = 'SELECT Ticker FROM _yahoo_fin_tickers WHERE Portfolio == 1' 
-    
+    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'
+    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Beursrally == 1 OR Portfolio == 1)'
+    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Ticker=="AAPL"'
+    #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Beursrally == 1 OR Portfolio == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
+
     cur_tickers.execute(my_ticker_query)    
     my_tickers_list = cur_tickers.fetchall()
-    my_tickers = [x[0] for x in my_tickers_list]
+    my_tickers = [x for x in my_tickers_list]
+    #my_tickers = [x[0] for x in my_tickers_list]
+    #print(my_tickers)
     #my_tickers = ["BABA","CRWD"]
 
-    for my_ticker in my_tickers:
+    for my_ticker,my_company in my_tickers:
         try:
-            my_stock = Stock(conn_data,my_ticker,my_start,my_end)
+            my_stock = Stock(conn_data,my_ticker,my_company,my_start,my_end)
             if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
                 my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors)
