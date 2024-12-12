@@ -108,185 +108,114 @@ def main():
 
     # LOAD TICKER DATA #
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1"""
-    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) ORDER BY Ticker ASC'    
-    my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Beursrally == 1 OR Portfolio == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
-    my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
+    my_ticker_types = ["Beursrally","Portfolio","ExchangeRates","Oil","Crypto","PreciousMetals","Other","Dow","SP500","Screener","Nasdaq"]
     
-    #print(my_tickers)
-    #my_tickers_orig = [x[0] for x in my_tickers_list]
-    #my_tickers = [s.replace('', '') for s in my_tickers_orig[0]]
-    #my_tickers['Ticker'] = my_tickers['Ticker'].str.replace(".", "-")
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
-    my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
-    my_tickers.set_index('Ticker', inplace=True)
-    #print(my_tickers)
-    #my_tickers = ["BABA","CRWD"]
+    for my_ticker_type in my_ticker_types:
+        my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE ' + my_ticker_type + ' == 1'    
+        my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
+        my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
+        my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
+        my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
+        my_tickers['Ticker'] = my_tickers['Ticker'].replace('HEI.A', 'HEI-A')
+        my_tickers['Ticker'] = my_tickers['Ticker'].replace('VUSA.AS', 'VUSA-AS')
+        my_tickers.set_index('Ticker', inplace=True)
 
-    #print(my_tickers)
-    # DOWNLOAD DATA IN CHUNKS #
-    #print("Number of tickers: " + str(len(my_tickers[0])))
-    print("Stock data from " + str(my_start) + " until " + str(my_end))
-    chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
-    #print("chunks: " + str(chunks))
-    for chunk in chunks:
-            
-        #print(str(chunk) + "\n")
-        print(" ".join(chunk))
-        retry_count = 0
-  
-        while retry_count < max_retries:
+        # DOWNLOAD DATA IN CHUNKS #
+        #print("Number of tickers: " + str(len(my_tickers[0])))
+        print("Stock data from " + str(my_start) + " until " + str(my_end))
+        chunks = [my_tickers[i:i + chunksize].index for i in range(0, len(my_tickers), chunksize)]
+        #print("chunks: " + str(chunks))
+        for chunk in chunks:
+                
+            #print(str(chunk) + "\n")
+            print(" ".join(chunk))
+            retry_count = 0
+    
+            while retry_count < max_retries:
+                try:
+                    data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False,)
+                    break
+                    #print(data)
+                except Exception as e:          
+                    # Print the exception message along with the line number
+                    print(f"Exception occurred on line {line_number}: {e}")
+                    retry_count += 1
+                    print(f"Error with {chunk}, retry {retry_count}: {e}")
+                    time.sleep(5)  # Wait before retrying
+            if retry_count == max_retries:
+                print(f"Failed to fetch data for {chunk} after {max_retries} retries.")
+
+            #print(data.describe())
+            #print(chunk)
+            #print(data)
+            for my_ticker in chunk:
+                my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
+                my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
+                #my_ticker_df["Ticker"] = my_ticker
+                if not pd.isnull(my_ticker_df['AdjClose']).all():
+                    my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
+                else:
+                    print(my_ticker + " has no data.")
+            time.sleep(1)  
+        
+        
+        #print(my_tickers.iterrows())
+        #print("Calculate Features:")
+        for my_ticker,my_company in my_tickers.iterrows():
             try:
-                data = yf.download(" ".join(chunk),start=my_start,end=my_end,actions=False,)
-                break
-                #print(data)
-            except Exception as e:          
+                print(my_ticker + " " + my_company)
+                my_stock = Stock(conn_data,my_ticker,my_company, my_start,my_end)
+                if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
+                    my_stock.dropna()
+
+                    my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
+                    my_stock.stockdata["SMA10"] = ta.SMA(my_stock.stockdata['Close'],10)
+                    my_stock.stockdata["SMA50"] = ta.SMA(my_stock.stockdata['Close'],50)
+                    my_stock.stockdata["SMA150"] = ta.SMA(my_stock.stockdata['Close'],150)
+                    my_stock.stockdata["SMA200"] = ta.SMA(my_stock.stockdata['Close'],200)
+                    my_stock.stockdata["TEMA5"] = ta.TEMA(my_stock.stockdata['Close'],5) 
+                    my_stock.stockdata["TEMA10"] = ta.TEMA(my_stock.stockdata['Close'],10)
+                    my_stock.stockdata["TEMA20"] = ta.TEMA(my_stock.stockdata['Close'],20)
+                    my_stock.stockdata["TEMA50"] = ta.TEMA(my_stock.stockdata['Close'],50)
+                    my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
+                    my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=10)
+                    #my_stock.stockdata["ADX"] = ta.ADX()
+                    my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
+                    my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
+                    my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change()
+                    my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
+
+                    my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
+                    my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
+                    my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
+                    my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
+                    my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
+                    my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
+                    my_stock.stockdata['MACD_slope'] = np.gradient(my_stock.stockdata['MACD'], 1)
+                    my_stock.stockdata['MACD_sign_change'] = np.sign(my_stock.stockdata['MACD_slope']).diff()
+
+                    my_stock.stockdata['30'] = 30 
+                    my_stock.stockdata['70'] = 70 
+                    my_stock.stockdata['RSI_XABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['30'],my_stock.stockdata['30'])
+                    my_stock.stockdata['RSI_XBELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['70'],my_stock.stockdata['70'])
+                    #my_stock.stockdata['RSI_position'] = RSI_position(my_stock.stockdata['RSI_X_ABOVE_30'],my_stock.stockdata['RSI_X_BELOW_70'])
+                    #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                    #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
+                    my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                    my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
+                
+                    my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
+        
+            except Exception as e:
+                # Get the exception information including the line number
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                
+                # Extract the line number
+                line_number = exc_tb.tb_lineno
+                
                 # Print the exception message along with the line number
-                print(f"Exception occurred on line {line_number}: {e}")
-                retry_count += 1
-                print(f"Error with {chunk}, retry {retry_count}: {e}")
-                time.sleep(5)  # Wait before retrying
-        if retry_count == max_retries:
-            print(f"Failed to fetch data for {chunk} after {max_retries} retries.")
-
-        #print(data.describe())
-        #print(chunk)
-        #print(data)
-        for my_ticker in chunk:
-            my_ticker_df = data.loc[:,[("Adj Close",my_ticker),("Close",my_ticker),("High",my_ticker),("Low",my_ticker),("Open",my_ticker),("Volume",my_ticker)]]
-            my_ticker_df.columns = ["AdjClose","Close","High","Low","Open","Volume"]
-            #my_ticker_df["Ticker"] = my_ticker
-            if not pd.isnull(my_ticker_df['AdjClose']).all():
-                my_ticker_df.to_sql(my_ticker, conn_data, if_exists='replace')
-            else:
-                print(my_ticker + " has no data.")
-        time.sleep(1)  
-    
-    
-    #print(my_tickers.iterrows())
-    #print("Calculate Features:")
-    for my_ticker,my_company in my_tickers.iterrows():
-        try:
-            #print(my_ticker + " " + my_company)
-            my_stock = Stock(conn_data,my_ticker,my_company, my_start,my_end)
-            if type(my_stock.stockdata["AdjClose"].iloc[0]) == np.float64:
-                #print(my_stock.ticker)
-                my_stock.dropna()
-                #my_stoplosses_pd = stoploss_pd[stoploss_pd["SL_Ticker"] == my_stock.ticker]
-                
-                #if 
-                #
-                #my_stock.stockdata['stoploss'] = my_stoplosses
-                #if len(my_stoplosses_pd) > 0:
-                    #print(my_stoplosses_pd)
-                    #print(my_stock.stockdata.head(10))
-                    #print("stoploss " + my_stock.ticker)
-                #    my_stock.stockdata = my_stock.stockdata.join(my_stoplosses_pd["SL_Price"], how='left')
-                #else:
-                #    my_stock.stockdata["SL_Price"] = np.nan
-                #print(my_stock.stockdata["SL_Price"].tail(10))
-                my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
-                my_stock.stockdata["SMA10"] = ta.SMA(my_stock.stockdata['Close'],10)
-                my_stock.stockdata["SMA50"] = ta.SMA(my_stock.stockdata['Close'],50)
-                my_stock.stockdata["SMA150"] = ta.SMA(my_stock.stockdata['Close'],150)
-                my_stock.stockdata["SMA200"] = ta.SMA(my_stock.stockdata['Close'],200)
-                my_stock.stockdata["TEMA5"] = ta.TEMA(my_stock.stockdata['Close'],5) 
-                my_stock.stockdata["TEMA10"] = ta.TEMA(my_stock.stockdata['Close'],10)
-                my_stock.stockdata["TEMA20"] = ta.TEMA(my_stock.stockdata['Close'],20)
-                my_stock.stockdata["TEMA50"] = ta.TEMA(my_stock.stockdata['Close'],50)
-                my_stock.stockdata["OBV"] = ta.OBV(my_stock.stockdata['Close'],my_stock.stockdata['Volume'])
-                my_stock.stockdata["RSI"] = ta.RSI(my_stock.stockdata['Close'],timeperiod=10)
-                #my_stock.stockdata["ADX"] = ta.ADX()
-                my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'], my_stock.stockdata['MACDHist'] = ta.MACD(my_stock.stockdata['Close'], fastperiod=MACD_FAST, slowperiod=MACD_SLOW, signalperiod=MACD_SIGNAL)
-                my_stock.stockdata['ClosePercentChange'] = my_stock.stockdata['AdjClose'].pct_change()
-                my_stock.stockdata['VolumePercentChange'] = my_stock.stockdata['Volume'].pct_change()
-                my_stock.stockdata['SMA50PercentChange'] = my_stock.stockdata['SMA50'].pct_change()
-
-                my_stock.stockdata['prevTEMA5'] = my_stock.stockdata['TEMA5'].shift(1)
-                my_stock.stockdata['prevTEMA20'] = my_stock.stockdata['TEMA20'].shift(1)                
-                my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
-                my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
-                my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
-                my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
-                my_stock.stockdata['MACD_slope'] = np.gradient(my_stock.stockdata['MACD'], 1)
-                my_stock.stockdata['MACD_sign_change'] = np.sign(my_stock.stockdata['MACD_slope']).diff()
-
-                my_stock.stockdata['30'] = 30 
-                my_stock.stockdata['70'] = 70 
-                my_stock.stockdata['RSI_XABOVE_30'] = cross_above(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['30'],my_stock.stockdata['30'])
-                my_stock.stockdata['RSI_XBELOW_70'] = cross_below(my_stock.stockdata['prevRSI'],my_stock.stockdata["RSI"],my_stock.stockdata['70'],my_stock.stockdata['70'])
-                #my_stock.stockdata['RSI_position'] = RSI_position(my_stock.stockdata['RSI_X_ABOVE_30'],my_stock.stockdata['RSI_X_BELOW_70'])
-                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = cross_above(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
-                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
-                my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = cross_above(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
-                my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = cross_below(my_stock.stockdata['prevMACD'],my_stock.stockdata['MACD'],my_stock.stockdata['prevMACDSignal'],my_stock.stockdata['MACDSignal'])
-                # Create buy signals where RSI crosses below 30
-                #my_stock.stockdata['MACD_XBELOW_MACDSignal'] = my_stock.stockdata[(my_stock.stockdata['RSI'] < 70) & (my_stock.stockdata['prevRSI'] >= 70)]
-                #my_stock.stockdata['RSI_ABOVE_50'] = np.where(my_stock.stockdata['RSI'] > 50, True, False)
-                #my_stock.stockdata['RSI_BELOW_50'] = np.where(my_stock.stockdata['RSI'] < 50, True, False)
-                #my_stock.stockdata['RSI_ABOVE_70'] = np.where(my_stock.stockdata['RSI'] > 70, True, False)
-                #my_stock.stockdata['RSI_BELOW_70'] = np.where(my_stock.stockdata['RSI'] < 70, True, False)
-                #my_stock.stockdata['RSI_BELOW_30'] = np.where(my_stock.stockdata['RSI'] < 30, True, False)
-                #my_stock.stockdata['RSI_ABOVE_30'] = np.where(my_stock.stockdata['RSI'] > 30, True, False)
-                #my_stock.stockdata['TEMA5_ABOVE_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] > my_stock.stockdata['TEMA20'], True, False)
-                #my_stock.stockdata['TEMA5_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], True, False)
-                #my_stock.stockdata['TEMA20_ABOVE_SMA50'] = np.where(my_stock.stockdata['TEMA20'] > my_stock.stockdata['SMA50'], True, False)
-                #my_stock.stockdata['TEMA20_BELOW_SMA50'] = np.where(my_stock.stockdata['TEMA20'] < my_stock.stockdata['SMA50'], True, False)
-                #my_stock.stockdata['MACD_ABOVE_MACDSignal'] = np.where(my_stock.stockdata['MACD'] > my_stock.stockdata['MACDSignal'], True, False)
-                #my_stock.stockdata['MACD_BELOW_MACDSignal'] = np.where(my_stock.stockdata['MACD'] < my_stock.stockdata['MACDSignal'], True, False)
-                #my_stock.stockdata['RSI_DIFF_30'] = my_stock.stockdata["RSI"] - 30
-                #my_stock.stockdata['RSI_DIFF_70'] = my_stock.stockdata["RSI"] - 70
-                #my_stock.stockdata['SMA50_DIFF_TEMA20'] = my_stock.stockdata["SMA50"] - my_stock.stockdata["TEMA20"]
-                #my_stock.stockdata['SMA50_DIFF_TEMA5'] = my_stock.stockdata["SMA50"] - my_stock.stockdata["TEMA5"]
-                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_spike_on_upward_cross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'])
-                
-                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'],my_stock.stockdata['SMA50'],0.5)
-                #my_stock.stockdata['TEMA5_X_BELOW_SMA50'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['SMA50'],1)
-                #my_stock.stockdata['TEMA5_X_ABOVE_SMA50_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_SMA50'] - my_stock.stockdata['TEMA5_X_BELOW_SMA50']
-                #my_stock.stockdata['TEMA5_X_BELOW_SMA50_NET'] = my_stock.stockdata['TEMA5_X_BELOW_SMA50'] - my_stock.stockdata['TEMA5_X_ABOVE_SMA50']
-                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = generate_signal_on_upcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
-                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = generate_signal_on_downcross(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'],1)
-                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] - my_stock.stockdata['TEMA5_X_BELOW_TEMA20']
-                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20_NET'] = my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] - my_stock.stockdata['TEMA5_X_ABOVE_TEMA20']
-                #my_stock.stockdata['CLOSE_X_NET_SMA50'] = my_stock.stockdata['CLOSE_X_ABOVE_SMA50'] - my_stock.stockdata['CLOSE_X_BELOW_SMA50']
-                #my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] = generate_signal_on_upcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
-                #my_stock.stockdata['MACD_X_BELOW_MACDSignal'] = generate_signal_on_downcross(my_stock.stockdata['MACD'], my_stock.stockdata['MACDSignal'],1)
-                #my_stock.stockdata['MACD_X_NET_MACDSignal'] = my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] - my_stock.stockdata['MACD_X_BELOW_MACDSignal']
-                #signals = generate_signals(my_stock.stockdata["RSI"])
-                #signals_series = pd.Series(signals, index=my_stock.stockdata["RSI"].index)
-                #my_stock.stockdata['RSI_X_ABOVE_30'] = signals_series[signals_series == 1]
-                #my_stock.stockdata['RSI_X_BELOW_70'] = signals_series[signals_series == -1]
-                #my_stock.stockdata['MACD_DIFF_MACDSignal'] = scaler.fit_transform((my_stock.stockdata['MACD'] - my_stock.stockdata['MACDSignal']).values.reshape(-1, 1))
-                #my_stock.stockdata['TEMA5_DIFF_TEMA20'] = scaler.fit_transform((my_stock.stockdata['TEMA5'] - my_stock.stockdata['TEMA20']).values.reshape(-1, 1))
-                #my_stock.stockdata['TEMA20_DIFF_SMA50'] = scaler.fit_transform((my_stock.stockdata['TEMA20'] - my_stock.stockdata['SMA50']).values.reshape(-1, 1))
-                #my_stock.stockdata['BUY_SIGNAL'] = my_stock.stockdata['MACD_DIFF_MACDSignal'] + my_stock.stockdata['TEMA5_DIFF_TEMA20'] + my_stock.stockdata['TEMA20_DIFF_SMA50'] + my_stock.stockdata['CLOSE_DIFF_SMA50']
-                #my_stock.stockdata['curBuy'] = my_stock.stockdata['RSI_X_ABOVE_30'] + my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] #+ my_stock.stockdata['MACD_X_ABOVE_MACDSignal'] 
-                #my_stock.stockdata['Buy'] = my_stock.stockdata['curBuy'].rolling(6, min_periods=1).sum()
-                #my_stock.stockdata['curSell'] = my_stock.stockdata['RSI_X_BELOW_70'] + my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] #+ my_stock.stockdata['MACD_X_BELOW_MACDSignal']
-                #my_stock.stockdata['Sell'] = my_stock.stockdata['curSell'].rolling(6, min_periods=1).sum()
-                #my_stock.stockdata['Buy'] = my_stock.stockdata[['RSI_X_ABOVE_30','TEMA5_X_ABOVE_TEMA20','MACD_X_ABOVE_MACDSignal']].all()
-                #my_stock.stockdata['Sell'] = my_stock.stockdata[['RSI_X_BELOW_70','TEMA5_X_BELOW_TEMA20','MACD_X_BELOW_MACDSignal']].all()
-                #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = np.where(my_stock.stockdata['TEMA5'] < my_stock.stockdata['TEMA20'], 1, 0)
-                #my_stock.stockdata['TEMA5_X_ABOVE_TEMA20'] = crossover(my_stock.stockdata['TEMA5'], my_stock.stockdata['TEMA20'])
-                #my_stock.stockdata['X_TEMA5_TEMA20'] = Cross(my_stock,"TEMA5","TEMA20").detect()
-                #my_stock.stockdata.dropna(inplace=True)
-                #my_stock.stockdata['TEMA20_SMA50_crossover'] = np.vectorize(find_TEMA20_SMA50_crossover)(my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"],my_stock.stockdata["prevSMA50"],my_stock.stockdata["SMA50"])     
-                #my_stock.stockdata['TEMA5_TEMA20'] = np.vectorize(TEMA5_TEMA20_crossover)(my_stock.stockdata["prevTEMA5"],my_stock.stockdata["TEMA5"],my_stock.stockdata["prevTEMA20"],my_stock.stockdata["TEMA20"])            
-                #print(my_stock.stockdata["SL_Price"].tail(10))
-                my_stock.stockdata.to_sql(my_ticker, conn_data, if_exists='replace', index = True)
-    
-        except Exception as e:
-            # Get the exception information including the line number
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            
-            # Extract the line number
-            line_number = exc_tb.tb_lineno
-            
-            # Print the exception message along with the line number
-            print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
-            continue
+                print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
+                continue
 
     cur_data.close()
     conn_data.close()
