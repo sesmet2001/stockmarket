@@ -57,18 +57,21 @@ def main():
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
 
 
-    my_tickers['ticker'] = my_tickers['ticker'].replace('BRK.A', 'BRK-A')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('BRK.B', 'BRK-B')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('BF.B', 'BF-B')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('PBR.A', 'PBR-A')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('LEN.B', 'LEN-B')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('HEI.A', 'HEI-A')
-    my_tickers['ticker'] = my_tickers['ticker'].replace('VUSA.AS', 'VUSA-AS')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('BRK.A', 'BRK-A')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('BRK.B', 'BRK-B')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('BF.B', 'BF-B')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('PBR.A', 'PBR-A')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('LEN.B', 'LEN-B')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('HEI.A', 'HEI-A')
+    #my_tickers['ticker'] = my_tickers['ticker'].replace('VUSA.AS', 'VUSA-AS')
     #my_tickers.set_index('ticker', inplace=True)
 
     print("Stock data from " + str(my_start) + " until " + str(my_end))
     for index, row in my_tickers.iterrows():
-        print(str(index) + ": " + row['ticker'] + " (Start: " + str(start_time) + " - Current: " + str(datetime.now()) + ")")
+        if (index != 0 & index % 1000 == 0):
+            time.sleep(60)
+        my_log = str(index) + ": " + row['ticker'] + " (Start: " + str(start_time) + " - Current: " + str(datetime.now()) + ")"
+        print(my_log)
         try: 
             my_ticker = yf.Ticker(row['ticker'])
             my_ticker_df = my_ticker.history(start=my_start,end=my_end)
@@ -77,7 +80,7 @@ def main():
                 my_ticker_df.to_sql(row['ticker'], conn_data, if_exists='replace')
             else:
                 print(row['ticker'] + " has no data.")
-                remaining_tickers.append[row['ticker']]
+                remaining_tickers.append[my_log]
         except Exception as e:
             # Print error message and traceback details
             print("An error occurred:")
