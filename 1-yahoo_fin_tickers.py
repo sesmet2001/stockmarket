@@ -218,9 +218,8 @@ def main():
         #print("before concat")
         pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
         #print("after concat")
-        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='ticker')
         pd_all_tickers['ticker'] = pd_all_tickers['ticker'].str.replace('.', '-', regex=False)
-
+        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='ticker')
 
         # Mark tickers
         pd_final_tickers = pd_all_tickers.copy()
