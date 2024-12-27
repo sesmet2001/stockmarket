@@ -68,7 +68,7 @@ def main():
 
     print("Stock data from " + str(my_start) + " until " + str(my_end))
     for index, row in my_tickers.iterrows():
-        if (index != 0 & index % 1000 == 0):
+        if index % 500 == 0:
             time.sleep(60)
         my_log = str(index) + ": " + row['ticker'] + " (Start: " + str(start_time) + " - Current: " + str(datetime.now()) + ")"
         print(my_log)
