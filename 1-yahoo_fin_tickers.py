@@ -4,52 +4,61 @@ import yfinance as yf
 import pandas as pd
 import sqlite3
 import os
+import traceback
 
 def main():
     try:
         #  Define variables
         DB_PATH = os.getenv('DB_PATH')
         conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
+        conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)
 
         # Screener tickers
-        conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-screener.db")
         pd_screener_tickers = pd.read_sql_query("SELECT symbol,company_name FROM screener", conn_screener)
-        lst_screener_tickers = pd_screener_tickers['symbol'].tolist()
-        pd_screener_tickers.rename(columns={'symbol': 'Ticker'}, inplace=True)
-        pd_screener_tickers.rename(columns={'company_name': 'Company'}, inplace=True)
-        pd_screener_tickers.set_index(['Ticker'])
+        pd_screener_tickers.loc[:, 'ticker'] = pd_screener_tickers['symbol']
+        pd_screener_tickers.drop(columns=['symbol'], inplace=True)
+        lst_screener_tickers = pd_screener_tickers['ticker'].tolist()
+        pd_screener_tickers.set_index(['ticker'])
+        
         print("screener tickers done")
 
         # Dow Jones tickers
         pd_dow_tickers_full = si.tickers_dow(include_company_data = True)
         pd_dow_tickers = pd_dow_tickers_full[['Symbol','Company']]
-        lst_dow_tickers = pd_dow_tickers['Symbol']
-        pd_dow_tickers.rename(columns={'Symbol': 'Ticker'}, inplace=True)
-        pd_dow_tickers.set_index(['Ticker'])
+        pd_dow_tickers = pd_dow_tickers.copy()
+        pd_dow_tickers.loc[:, 'ticker'] = pd_dow_tickers['Symbol']
+        pd_dow_tickers.set_index(['ticker'])
+        pd_dow_tickers.drop(columns=['Symbol'], inplace=True)
+        lst_dow_tickers = pd_dow_tickers['ticker']
+        pd_dow_tickers.loc[:, 'company_name'] = pd_dow_tickers['Company']
+        pd_dow_tickers.drop(columns=['Company'], inplace=True)
         print("dow tickers done")
 
         # SP500 tickers
-        #pd_sp500_tickers_full = si.tickers_sp500(include_company_data = True)
+        #pd_sp500_tickers_full = si.tickers_sp500(include_company_name_data = True)
         #pd_sp500_tickers = pd_sp500_tickers_full[['Symbol','Security']]
         lst_sp500_tickers = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
         #print(lst_sp500_tickers)
         dict_sp500_tickers = {
-            "Ticker": lst_sp500_tickers.Symbol,
-            "Company": lst_sp500_tickers.Company
+            "ticker": lst_sp500_tickers.Symbol,
+            "company_name": lst_sp500_tickers.Security
         }
         lst_sp500_tickers = lst_sp500_tickers['Symbol']
         pd_sp500_tickers = pd.DataFrame.from_dict(dict_sp500_tickers) 
-        pd_sp500_tickers.set_index(['Ticker'])
+        pd_sp500_tickers.set_index(['ticker'])
         print("sp500 tickers done")
 
         # Nasdaq tickers
         pd_nasdaq_tickers_full = si.tickers_nasdaq(include_company_data = True)
         pd_nasdaq_tickers = pd_nasdaq_tickers_full[['Symbol','Security Name']]
         lst_nasdaq_tickers = pd_nasdaq_tickers['Symbol']
-        pd_nasdaq_tickers.rename(columns={'Symbol': 'Ticker'}, inplace=True)
-        pd_nasdaq_tickers.rename(columns={'Security Name': 'Company'}, inplace=True)
-        pd_nasdaq_tickers.set_index(['Ticker'])
+        pd_nasdaq_tickers = pd_nasdaq_tickers.copy()
+        pd_nasdaq_tickers.loc[:, 'ticker'] = pd_nasdaq_tickers['Symbol']
+        pd_nasdaq_tickers.drop(columns=['Symbol'], inplace=True)
+        pd_nasdaq_tickers.loc[:, 'company_name'] = pd_nasdaq_tickers['Security Name']
+        pd_nasdaq_tickers.drop(columns=['Security Name'], inplace=True)
+        pd_nasdaq_tickers.set_index(['ticker'])
         pd_nasdaq_tickers.drop(index=pd_nasdaq_tickers.index[-1],axis=0,inplace=True)
         print("nasdaq tickers done")
 
@@ -98,32 +107,32 @@ def main():
 
         lst_beursrally_names = []
         # for my_ticker in lst_beursrally_tickers:
-        #     my_company = yf.Ticker(my_ticker).info.get("longName", "no name available")
-        #    #print(my_company)
-        #     lst_beursrally_names.append(my_company)
+        #     my_company_name = yf.ticker(my_ticker).info.get("longName", "no name available")
+        #    #print(my_company_name)
+        #     lst_beursrally_names.append(my_company_name)
         # print(lst_beursrally_names)
-        lst_beursrally_names = ['3M Company', 'Aalberts N.V.', 'Anheuser-Busch InBev SA/NV', 'Abbott Laboratories', 'AbbVie Inc.', 'ABN AMRO Bank N.V.', 'Accor SA', 'Ackermans & Van Haaren NV', 'Acomo N.V.', 'Adobe Inc.',\
+        lst_beursrally_names = ['3M company_name', 'Aalberts N.V.', 'Anheuser-Busch InBev SA/NV', 'Abbott Laboratories', 'AbbVie Inc.', 'ABN AMRO Bank N.V.', 'Accor SA', 'Ackermans & Van Haaren NV', 'Acomo N.V.', 'Adobe Inc.',\
                                 'Advanced Micro Devices, Inc.', 'Adyen N.V.', 'Aedifica NV/SA', 'Aegon Ltd.', 'PlayAGS, Inc.', 'Agfa-Gevaert NV', 'Koninklijke Ahold Delhaize N.V.', 'Air France-KLM SA', "L'Air Liquide S.A.", 'Airbnb, Inc.', \
-                                'Airbus SE', 'Akzo Nobel N.V.', 'Alfen N.V.', 'Alibaba Group Holding Limited', 'Allfunds Group plc', 'Compagnie des Alpes SA', 'Alphabet Inc.', 'Alstom SA', 'Amazon.com, Inc.', 'American Express Company',\
+                                'Airbus SE', 'Akzo Nobel N.V.', 'Alfen N.V.', 'Alibaba Group Holding Limited', 'Allfunds Group plc', 'Compagnie des Alpes SA', 'Alphabet Inc.', 'Alstom SA', 'Amazon.com, Inc.', 'American Express company_name',\
                                 'Affiliated Managers Group, Inc.', 'Amgen Inc.', 'Amundi BEL 20 UCITS ETF Dist', 'Amundi CAC 40 UCITS ETF Acc', 'Amundi EURO STOXX 50 II UCITS ETF Acc', 'Amundi Index Solutions - Amundi MSCI Emerging Markets UCITS ETF-C USD', 'Amundi Index Solutions - Amundi Nasdaq-100 ETF-C EUR', 'Amundi Japan TOPIX II UCITS ETF EUR Dist', 'Amundi MSCI New Energy ESG Screened UCITS ETF Dist', 'Amundi MSCI Robotics & AI ESG Screened UCITS ETF', \
                                 'Amundi MSCI World V UCITS ETF', 'Artisan Partners Asset Management Inc.', 'Apple Inc.', 'Arcadis NV', 'ArcelorMittal S.A.', 'argenx SE', 'Arkema S.A.', 'Arm Holdings plc', 'Ardmore Shipping Corporation', 'Avino Silver & Gold Mines Ltd.',\
                                 'ASML Holding N.V.', 'ASR Nederland N.V.', 'AT&T Inc.', 'Atenor SA', 'Avalo Therapeutics, Inc.', 'AXA SA', 'AXAWF Switzerland Eq A Cap EUR', 'Azelis Group NV', 'B&S Group S.A.', 'Koninklijke BAM Groep nv', \
                                 'GraniteShares Gold Trust', 'Barrick Gold Corporation', 'Global X Health & Wellness ETF', 'BE Semiconductor Industries N.V.', 'NV Bekaert SA', 'Berkshire Hathaway', 'Beyond Meat, Inc.', 'BlackBerry Limited', 'Biogen Inc.', 'bioMérieux S.A.',\
                                 'Biotalys NV', 'Birkenstock Holding plc', 'BL-Global Flexible EUR', 'BGF Continental Eurp Flex A2 EUR', 'BGF ESG Multi-Asset A2 EUR', 'Alphabet Inc.', 'BNP Paribas SA', 'BNP Paribas Aqua C C', 'BNP Paribas Disrpt Tech Cl C', 'BNY Mellon Brazil Equity EUR A Acc', \
-                                'The Boeing Company', 'Bolloré SE', 'Bonduelle SCA', 'Booking Holdings Inc.', 'Bouygues SA', 'bpost NV/SA', 'Banque nationale de Belgique SA', 'Brederode SA', 'Broadcom Inc.', 'Brunel International N.V.', 'Capgemini SE', 'Alphabet Inc.', 'Alphabet Inc.', 'Care Property Invest NV', 'Carnival Corporation & plc', 'Carrefour SA', 'Caterpillar Inc.', "Compagnie d'Entreprises CFE SA", 'Chevron Corporation', 'Compagnie du Bois Sauvage S.A.',\
-                                'Cisco Systems, Inc.', 'Citigroup Inc.', 'Clariane SE', 'CM.com N.V.', 'Cmb.Tech NV', 'The Coca-Cola Company', 'Cofinimmo SA', 'Coinbase Global, Inc.', 'Colgate-Palmolive Company', 'Colruyt Group N.V.', 'Comcast Corporation', 'Comgest Growth Europe EUR Acc', 'Corbion N.V.', 'Crédit Agricole S.A.', 'CTP N.V.', 'Danone S.A.', 'Dassault Systèmes SE', 'Deceuninck NV', 'DEME Group NV', "D'Ieteren Group SA", 'DNCA Invest SRI Europe Growth', 'DPAM B Equities Eur Sust B € Cap', 'DSM-Firmenich AG', 'eBay Inc.', 'Ebusco Holding N.V.', 'Econocom Group SE', 'Edenred SE', 'Ekopak NV', 'Electronic Arts Inc.', \
-                                'Eli Lilly and Company', 'Elia Group SA/NV', 'Engie SA', 'EssilorLuxottica Société anonyme', 'Eurazeo SE', 'Eurocommercial Properties N.V.', 'Eurofins Scientific SE', 'Euronext N.V.', 'EVS Broadcast Equipment SA', 'Exmar NV', 'Exor N.V.',\
+                                'The Boeing company_name', 'Bolloré SE', 'Bonduelle SCA', 'Booking Holdings Inc.', 'Bouygues SA', 'bpost NV/SA', 'Banque nationale de Belgique SA', 'Brederode SA', 'Broadcom Inc.', 'Brunel International N.V.', 'Capgemini SE', 'Alphabet Inc.', 'Alphabet Inc.', 'Care Property Invest NV', 'Carnival Corporation & plc', 'Carrefour SA', 'Caterpillar Inc.', "Compagnie d'Entreprises CFE SA", 'Chevron Corporation', 'Compagnie du Bois Sauvage S.A.',\
+                                'Cisco Systems, Inc.', 'Citigroup Inc.', 'Clariane SE', 'CM.com N.V.', 'Cmb.Tech NV', 'The Coca-Cola company_name', 'Cofinimmo SA', 'Coinbase Global, Inc.', 'Colgate-Palmolive company_name', 'Colruyt Group N.V.', 'Comcast Corporation', 'Comgest Growth Europe EUR Acc', 'Corbion N.V.', 'Crédit Agricole S.A.', 'CTP N.V.', 'Danone S.A.', 'Dassault Systèmes SE', 'Deceuninck NV', 'DEME Group NV', "D'Ieteren Group SA", 'DNCA Invest SRI Europe Growth', 'DPAM B Equities Eur Sust B € Cap', 'DSM-Firmenich AG', 'eBay Inc.', 'Ebusco Holding N.V.', 'Econocom Group SE', 'Edenred SE', 'Ekopak NV', 'Electronic Arts Inc.', \
+                                'Eli Lilly and company_name', 'Elia Group SA/NV', 'Engie SA', 'EssilorLuxottica Société anonyme', 'Eurazeo SE', 'Eurocommercial Properties N.V.', 'Eurofins Scientific SE', 'Euronext N.V.', 'EVS Broadcast Equipment SA', 'Exmar NV', 'Exor N.V.',\
                                 'Exxon Mobil Corporation', 'Fagron NV', 'Fastned B.V.', 'Flow Traders Ltd.', 'Fluxys Belgium SA', 'ForFarmers N.V.', 'Franklin MENA A(acc)EUR', 'Fugro N.V.', 'Fundsmith Equity R EUR Acc', 'Galapagos NV', 'GameStop Corp.', 'Groupe Bruxelles Lambert SA',\
-                                'GE Aerospace', 'Gen Digital Inc.', 'General Motors Company', 'Genfit S.A.', 'Gilead Sciences, Inc.', 'Gimv NV', 'Goldman Sachs Europe CORE Equity Portfolio Base Acc EUR', 'The Goldman Sachs Group, Inc.', 'Goldman Sachs Patrimonial Aggressive', \
+                                'GE Aerospace', 'Gen Digital Inc.', 'General Motors company_name', 'Genfit S.A.', 'Gilead Sciences, Inc.', 'Gimv NV', 'Goldman Sachs Europe CORE Equity Portfolio Base Acc EUR', 'The Goldman Sachs Group, Inc.', 'Goldman Sachs Patrimonial Aggressive', \
                                 'Greenyard NV', 'HAL Trust', 'Koninklijke Heijmans N.V.', 'Heineken N.V.', 'The Home Depot, Inc.', 'Home Invest Belgium S.A.', 'Honeywell International Inc.', 'HSBC GIF Turkey Equity AC', 'Hyloris Pharmaceuticals SA', 'Ion Beam Applications SA', \
                                 'Imerys S.A.', 'Immobel SA', 'ING Groep N.V.', 'InPost S.A.', 'Intel Corporation', 'International Business Machines Corporation', 'Invesco Funds - Invesco Pan European High Income Fund', 'iShares AEX UCITS ETF EUR (Dist)', \
                                 'iShares MSCI EM UCITS ETF USD (Dist)', 'iTeos Therapeutics, Inc.', "JDE Peet's N.V.", 'Jensen-Group NV', 'Johnson & Johnson', 'JPMorgan Chase & Co.', 'Just Eat Takeaway.com N.V.', 'KBC Group NV', 'KBC Ancora SA', 'Kendrion N.V.',\
-                                'Kering SA', 'Kinepolis Group NV', 'Klépierre SA', 'Koninklijke KPN N.V.', 'The Kraft Heinz Company', 'KraneShares CSI China Internet ETF', 'Legrand SA', 'Liberty Global Ltd.', "L'Oréal S.A.", 'Lotus Bakeries NV', 'Lucid Group, Inc.',\
+                                'Kering SA', 'Kinepolis Group NV', 'Klépierre SA', 'Koninklijke KPN N.V.', 'The Kraft Heinz company_name', 'KraneShares CSI China Internet ETF', 'Legrand SA', 'Liberty Global Ltd.', "L'Oréal S.A.", 'Lotus Bakeries NV', 'Lucid Group, Inc.',\
                                 'LVMH Moët Hennessy - Louis Vuitton, Société Européenne', 'M&G (Lux) Japan A EUR Acc', 'Manitou BF SA', 'Mastercard Incorporated', 'Materialise NV', "McDonald's Corporation", 'Melexis NV', 'Merck & Co., Inc.', 'Meta Platforms, Inc.', 'MFS Meridian European Research A1 EUR',\
                                 'Compagnie Générale des Établissements Michelin Société en commandite par actions', 'Microsoft Corporation', 'MicroStrategy Incorporated', 'Moderna, Inc.', 'Mondelez International, Inc.', 'Monster Beverage Corporation', 'Montea Comm. VA', 'Netflix, Inc.', 'Newmont Corporation',\
                                 'Nexans S.A.', 'Nextensa NV/SA', 'NIKE, Inc.', 'NN Group N.V.', 'Nokia Oyj', 'Norwegian Cruise Line Holdings Ltd.', 'NSI N.V.', 'NVIDIA Corporation', 'Nyxoah S.A.', 'OCI N.V.', 'OneSpan Inc.', 'Ontex Group NV', 'Onward Medical N.V.', 'OPmobility SE', 'Oracle Corporation',\
                                 'Orange Belgium S.A.', 'Palantir Technologies Inc.', 'PayPal Holdings, Inc.', 'PepsiCo, Inc.', 'Pernod Ricard SA', 'Peugeot Invest Société anonyme', 'Pfizer Inc.', 'Philip Morris International Inc.', 'Koninklijke Philips N.V.', 'Pictet - Biotech P EUR', 'Pictet-Timber P EUR',\
-                                'PIMCO GIS Income Fund E Class EUR (Hedged) Accumulation', 'Pinterest, Inc.', 'PostNL N.V.', 'The Procter & Gamble Company', 'Prosus N.V.', 'Proximus PLC', 'Publicis Groupe S.A.', 'Qrf Comm. VA', 'QUALCOMM Incorporated', 'Quest for Growth NV', 'Randstad N.V.', 'Recticel SA/NV',\
+                                'PIMCO GIS Income Fund E Class EUR (Hedged) Accumulation', 'Pinterest, Inc.', 'PostNL N.V.', 'The Procter & Gamble company_name', 'Prosus N.V.', 'Proximus PLC', 'Publicis Groupe S.A.', 'Qrf Comm. VA', 'QUALCOMM Incorporated', 'Quest for Growth NV', 'Randstad N.V.', 'Recticel SA/NV',\
                                 'Regeneron Pharmaceuticals, Inc.', 'RELX PLC', 'Rémy Cointreau SA', 'Renault SA', 'Retail Estates N.V.', 'Robeco Emerging Markets Equities D €', 'Robeco Global Consumer Trends D EUR', 'Robeco Indian Equities D €', 'Robeco New World Financials D €',\
                                 'Robeco QI Global Conservative Eqs D €', 'Roularta Media Group NV', 'RTX Corporation', 'SEB SA', 'Safran SA', 'Compagnie de Saint-Gobain S.A.', 'Salesforce, Inc.', 'Sanofi', 'SBM Offshore N.V.', 'Schlumberger Limited', 'Schneider Electric S.E.', \
                                 'Schroder ISF Emerging Asia A Acc EUR', 'Schroder ISF Greater China A Acc EUR', 'Seagate Technology Holdings plc', 'Séché Environnement SA', 'Shell plc', 'Shurgard Self Storage Ltd', 'Sif Holding N.V.', 'Signify N.V.', 'Sipef NV', 'Sligro Food Group N.V.', \
@@ -131,145 +140,145 @@ def main():
                                 'Tesla, Inc.', 'Tessenderlo Group NV', 'Texaf S.A.', 'Texas Instruments Incorporated', 'Thales S.A.', 'TINC NV', 'TKH Group N.V.', 'TomTom N.V.', 'TotalEnergies SE', 'The Travelers Companies, Inc.', 'Trigano S.A.', 'Triodos Impact Mixed Neutral EUR R Acc',\
                                 'Financière de Tubize SA', 'Uber Technologies, Inc.', 'Ubisoft Entertainment SA', 'UCB SA', 'Universal Music Group N.V.', 'Umicore SA', 'Unibail-Rodamco-Westfield SE', 'Unilever PLC', 'UnitedHealth Group Incorporated', 'Van Lanschot Kempen NV', 'Valeo SE', \
                                 'Vallourec S.A.', 'Van de Velde NV', 'Vanguard S&P 500 UCITS ETF', 'Vastned Retail N.V.', 'Vastned Belgium NV', 'Veolia Environnement SA', 'Verallia Société Anonyme', 'Verizon Communications Inc.', 'VGP NV', 'Vinci SA', 'Visa Inc.', 'Vivoryon Therapeutics N.V.',\
-                                'Koninklijke Vopak N.V.', 'Vranken-Pommery Monopole Société Anonyme', 'Walgreens Boots Alliance, Inc.', 'Walmart Inc.', 'The Walt Disney Company', 'Warehouses Estates Belgium S.C.A.', 'Warehouses De Pauw SA', 'Wendel', 'Wereldhave N.V.', 'Wereldhave Belgium',\
+                                'Koninklijke Vopak N.V.', 'Vranken-Pommery Monopole Société Anonyme', 'Walgreens Boots Alliance, Inc.', 'Walmart Inc.', 'The Walt Disney company_name', 'Warehouses Estates Belgium S.C.A.', 'Warehouses De Pauw SA', 'Wendel', 'Wereldhave N.V.', 'Wereldhave Belgium',\
                                 'Western Digital Corporation', "What's Cooking Group NV/SA", 'WisdomTree Brent Crude Oil', 'WisdomTree Cybersecurity UCITS ETF USD Acc', 'Wolters Kluwer N.V.', 'Worldline SA', 'X-FAB Silicon Foundries SE', 'Xior Student Housing NV']
         dict_beursrally_tickers = {
-            "Ticker": lst_beursrally_tickers,
-            "Company": lst_beursrally_names
+            "ticker": lst_beursrally_tickers,
+            "company_name": lst_beursrally_names
         }
         pd_beursrally_tickers = pd.DataFrame.from_dict(dict_beursrally_tickers) 
-        pd_beursrally_tickers.set_index(['Ticker'])
+        pd_beursrally_tickers.set_index(['ticker'])
         print("beursrally tickers done")
 
         # Portfolio
         dict_portfolio_tickers = {
-            "Ticker": [ "ASML","NVDA","AMZN","PLTR","AVGO","AI","BESI.AS","MRVL","S" ],
-            "Company":  [ "ASML","Nvidia","Amazon","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone" ]
+            "ticker": [ "ASML","NVDA","AMZN","PLTR","AVGO","AI","BESI.AS","MRVL","S" ],
+            "company_name":  [ "ASML","Nvidia","Amazon","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone" ]
         }
         pd_portfolio_tickers =  pd.DataFrame.from_dict(dict_portfolio_tickers) 
-        lst_portfolio_tickers = pd_portfolio_tickers['Ticker'] 
-        pd_portfolio_tickers.set_index(['Ticker'])
+        lst_portfolio_tickers = pd_portfolio_tickers['ticker'] 
+        pd_portfolio_tickers.set_index(['ticker'])
         print("portfolio tickers done")
 
         # Precious metals
         dict_precious_metals_tickers = {
-            "Ticker": [ "GC=F","SI=F","PA=F","PL=F" ],
-            "Company":  [ "Gold","Silver","Palladium","Platinum" ]
+            "ticker": [ "GC=F","SI=F","PA=F","PL=F" ],
+            "company_name":  [ "Gold","Silver","Palladium","Platinum" ]
         }
         pd_precious_metals_tickers =  pd.DataFrame.from_dict(dict_precious_metals_tickers) 
-        lst_precious_metals_tickers = pd_precious_metals_tickers['Ticker'] 
-        pd_precious_metals_tickers.set_index(['Ticker'])
+        lst_precious_metals_tickers = pd_precious_metals_tickers['ticker'] 
+        pd_precious_metals_tickers.set_index(['ticker'])
         print("precious metals tickers done")
 
         # Exchange rates
         dict_exchange_rates_tickers = {
-            "Ticker": [ "EURUSD=X","EURJPY=X","EURRUB=X" ],
-            "Company": [ "US Dollar", "Japanese Yen", "Russian Rouble"]
+            "ticker": [ "EURUSD=X","EURJPY=X","EURRUB=X" ],
+            "company_name": [ "US Dollar", "Japanese Yen", "Russian Rouble"]
         }
         pd_exchange_rates_tickers = pd.DataFrame.from_dict(dict_exchange_rates_tickers)  
-        lst_exchange_rates_tickers = pd_exchange_rates_tickers['Ticker']
-        pd_exchange_rates_tickers.set_index(['Ticker'])
-        print(pd_exchange_rates_tickers)
+        lst_exchange_rates_tickers = pd_exchange_rates_tickers['ticker']
+        pd_exchange_rates_tickers.set_index(['ticker'])
+        #print(pd_exchange_rates_tickers)
         print("exchange rates tickers done")       
 
         # Oil
         dict_oil_tickers = {
-            "Ticker": [ "CL=F" ],
-            "Company": [ "Crude oil" ]
+            "ticker": [ "CL=F" ],
+            "company_name": [ "Crude oil" ]
         }
         pd_oil_tickers = pd.DataFrame.from_dict(dict_oil_tickers)
-        lst_oil_tickers = pd_oil_tickers['Ticker']
-        pd_oil_tickers.set_index(['Ticker'])
-        print(pd_oil_tickers)
+        lst_oil_tickers = pd_oil_tickers['ticker']
+        pd_oil_tickers.set_index(['ticker'])
+        #print(pd_oil_tickers)
         print("oil tickers done")    
 
         # Crypto
         dict_crypto_tickers = {
-            "Ticker": ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"],
-            "Company": [ "Bitcoin","Ethereum","Binance Coin","Ripple","Solana","Cardano","Dogecoin","Chainlink","Polkadot","Shibu Inu"]
+            "ticker": ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"],
+            "company_name": [ "Bitcoin","Ethereum","Binance Coin","Ripple","Solana","Cardano","Dogecoin","Chainlink","Polkadot","Shibu Inu"]
         }
         pd_crypto_tickers = pd.DataFrame.from_dict(dict_crypto_tickers)  
-        lst_crypto_tickers = pd_crypto_tickers['Ticker']
-        pd_crypto_tickers.set_index(['Ticker'])
-        print(pd_crypto_tickers)
+        lst_crypto_tickers = pd_crypto_tickers['ticker']
+        pd_crypto_tickers.set_index(['ticker'])
+        #print(pd_crypto_tickers)
         print("crypto tickers done")    
 
         # Other tickers
         dict_other_tickers = {
-            "Ticker": [ "VUSA.AS" ],
-            "Company": [ "Vanguard S&P 500 UCITS ETF" ]
+            "ticker": [ "VUSA.AS" ],
+            "company_name": [ "Vanguard S&P 500 UCITS ETF" ]
         }
         pd_other_tickers = pd.DataFrame.from_dict(dict_other_tickers)  
-        lst_other_tickers = pd_other_tickers['Ticker']
-        pd_other_tickers.set_index(['Ticker'])
+        lst_other_tickers = pd_other_tickers['ticker']
+        pd_other_tickers.set_index(['ticker'])
         print("other tickers done")
 
 
         # Concat and remove duplicates
-        print("before concat")
+        #print("before concat")
         pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
-        print("after concat")
-        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='Ticker')
-        pd_alltemp_tickers = pd_all_tickers[pd_all_tickers['Ticker'] != 'BRK.B']
-        pd_final_tickers = pd_alltemp_tickers[pd_alltemp_tickers['Ticker'] != 'BF.B']
-
-        print(pd_final_tickers)
+        #print("after concat")
+        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='ticker')
 
         # Mark tickers
-        pd_final_tickers = pd_final_tickers.copy()
-        print("before loop")
+        pd_final_tickers = pd_all_tickers.copy()
         for index, row in pd_final_tickers.iterrows():
             #print("loop")
             for my_ticker in lst_screener_tickers:
                 #print("loop")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Screener"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "screener"] = 1
             for my_ticker in lst_dow_tickers:
                 #print("loop dow")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Dow"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "dow"] = 1
             for my_ticker in lst_sp500_tickers:
                 #print("loop sp500")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "SP500"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "sp500"] = 1
             for my_ticker in lst_nasdaq_tickers:
                 #print("loop nasdaq")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Nasdaq"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "nasdaq"] = 1
             for my_ticker in lst_beursrally_tickers:
                 #print("loop beursrally " + my_ticker)
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Beursrally"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "beursrally"] = 1
             for my_ticker in lst_portfolio_tickers:
                 #print("loop beursrally " + my_ticker)
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Portfolio"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "portfolio"] = 1
             for my_ticker in lst_precious_metals_tickers:
                 #print("loop metals)")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "PreciousMetals"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "preciousMetals"] = 1
             for my_ticker in lst_exchange_rates_tickers:
                 #print("loop exhchange")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "ExchangeRates"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "exchangeRates"] = 1
             for my_ticker in lst_oil_tickers:
                 #print("loop oil")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Oil"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "oil"] = 1
             for my_ticker in lst_crypto_tickers:
                 #print("loop crypto")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Crypto"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "crypto"] = 1
             for my_ticker in lst_other_tickers:
                 #print("loop other")
-                if my_ticker == row['Ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "Other"] = 1
+                if my_ticker == row['ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "other"] = 1
 
         pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn_tickers, if_exists='replace')
         conn_tickers.close()
         print("all done")
     except Exception as e:
-        print(e)
+        # Print error message and traceback details
+        print("An error occurred:")
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {e}")
+        traceback_details = traceback.format_exc()
+        print(f"Traceback Details:\n{traceback_details}")
 
 if __name__ == "__main__":
     main()
