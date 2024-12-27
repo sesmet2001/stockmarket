@@ -80,10 +80,10 @@ def main():
                 my_ticker_df.to_sql(row['ticker'], conn_data, if_exists='replace')
             else:
                 print(row['ticker'] + " has no data.")
-                remaining_tickers.append[my_log]
+                remaining_tickers.append(my_log)
         except Exception as e:
             # Print error message and traceback details
-            remaining_tickers.append[my_log]
+            remaining_tickers.append(my_log)
             print("An error occurred:")
             print(f"Error Type: {type(e).__name__}")
             print(f"Error Message: {e}")
