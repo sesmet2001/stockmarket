@@ -20,6 +20,7 @@ class Stock(Asset):
     def __init__(self, my_conn, my_ticker, my_company, my_startdate, my_enddate):
         self.type = "stock"
         self.ticker = my_ticker
+
         self.company_name = my_company
         my_sql = "SELECT * from '" + my_ticker + "' WHERE Date >= '" + str(my_startdate) + "' AND Date < '" + str(my_enddate) + "'"
         #print(my_sql)
