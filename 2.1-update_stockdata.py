@@ -85,6 +85,7 @@ def main():
             print(f"Error Message: {e}")
             traceback_details = traceback.format_exc()
             print(f"Traceback Details:\n{traceback_details}")
+    print(remaining_tickers)
     cur_data.close()
     conn_data.close()
     cur_tickers.close()
