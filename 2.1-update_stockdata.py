@@ -32,7 +32,7 @@ def main():
     my_strategy = "X_TEMA5_TEMA20"
     start_time = datetime.now()
     #yf.pdr_override() 
-
+    remaining_tickers = []
     #print(sys.path)
     pd.set_option('display.max_rows', 10)
     scaler = MinMaxScaler(feature_range=(-1, 1))
@@ -77,7 +77,7 @@ def main():
                 my_ticker_df.to_sql(row['ticker'], conn_data, if_exists='replace')
             else:
                 print(row['ticker'] + " has no data.")
-                break
+                remaining_tickers.append[row['ticker']]
         except Exception as e:
             # Print error message and traceback details
             print("An error occurred:")
