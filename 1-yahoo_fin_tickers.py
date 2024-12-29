@@ -142,6 +142,7 @@ def main():
                                 'Vallourec S.A.', 'Van de Velde NV', 'Vanguard S&P 500 UCITS ETF', 'Vastned Retail N.V.', 'Vastned Belgium NV', 'Veolia Environnement SA', 'Verallia Société Anonyme', 'Verizon Communications Inc.', 'VGP NV', 'Vinci SA', 'Visa Inc.', 'Vivoryon Therapeutics N.V.',\
                                 'Koninklijke Vopak N.V.', 'Vranken-Pommery Monopole Société Anonyme', 'Walgreens Boots Alliance, Inc.', 'Walmart Inc.', 'The Walt Disney company_name', 'Warehouses Estates Belgium S.C.A.', 'Warehouses De Pauw SA', 'Wendel', 'Wereldhave N.V.', 'Wereldhave Belgium',\
                                 'Western Digital Corporation', "What's Cooking Group NV/SA", 'WisdomTree Brent Crude Oil', 'WisdomTree Cybersecurity UCITS ETF USD Acc', 'Wolters Kluwer N.V.', 'Worldline SA', 'X-FAB Silicon Foundries SE', 'Xior Student Housing NV']
+        print("Beursrally: " + str(len(lst_beursrally_names)))
         dict_beursrally_tickers = {
             "ticker": lst_beursrally_tickers,
             "company_name": lst_beursrally_names
@@ -218,7 +219,6 @@ def main():
         #print("before concat")
         pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
         #print("after concat")
-        pd_all_tickers['ticker'] = pd_all_tickers['ticker'].str.replace('.', '-', regex=False)
         pd_all_tickers = pd_all_tickers.drop_duplicates(subset='ticker')
 
         # Mark tickers
@@ -269,7 +269,7 @@ def main():
                 #print("loop other")
                 if my_ticker == row['ticker']:
                     pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "other"] = 1
-
+        pd_all_tickers['ticker'] = pd_all_tickers['ticker'].str.replace('.', '-', regex=False)
         pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn_tickers, if_exists='replace')
         conn_tickers.close()
         print("all done")
