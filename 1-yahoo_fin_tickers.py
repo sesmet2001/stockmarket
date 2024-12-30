@@ -16,10 +16,10 @@ def main():
 
         # Screener tickers
         pd_screener_tickers = pd.read_sql_query("SELECT symbol,company_name FROM screener", conn_screener)
-        pd_screener_tickers.loc[:, 'ticker'] = pd_screener_tickers['symbol']
-        pd_screener_tickers.drop(columns=['symbol'], inplace=True)
-        lst_screener_tickers = pd_screener_tickers['ticker'].tolist()
-        pd_screener_tickers.set_index(['ticker'])
+        pd_screener_tickers.loc[:, 'Ticker'] = pd_screener_tickers['Symbol']
+        pd_screener_tickers.drop(columns=['Symbol'], inplace=True)
+        lst_screener_tickers = pd_screener_tickers['Ticker'].tolist()
+        pd_screener_tickers.set_index(['Ticker'])
         
         print("screener tickers done")
 
@@ -27,12 +27,10 @@ def main():
         pd_dow_tickers_full = si.tickers_dow(include_company_data = True)
         pd_dow_tickers = pd_dow_tickers_full[['Symbol','Company']]
         pd_dow_tickers = pd_dow_tickers.copy()
-        pd_dow_tickers.loc[:, 'ticker'] = pd_dow_tickers['Symbol']
-        pd_dow_tickers.set_index(['ticker'])
+        pd_dow_tickers.loc[:, 'Ticker'] = pd_dow_tickers['Symbol']
+        pd_dow_tickers.set_index(['Ticker'])
         pd_dow_tickers.drop(columns=['Symbol'], inplace=True)
-        lst_dow_tickers = pd_dow_tickers['ticker']
-        pd_dow_tickers.loc[:, 'company_name'] = pd_dow_tickers['Company']
-        pd_dow_tickers.drop(columns=['Company'], inplace=True)
+        lst_dow_tickers = pd_dow_tickers['Ticker']
         print("dow tickers done")
 
         # SP500 tickers
@@ -41,12 +39,12 @@ def main():
         lst_sp500_tickers = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
         #print(lst_sp500_tickers)
         dict_sp500_tickers = {
-            "ticker": lst_sp500_tickers.Symbol,
-            "company_name": lst_sp500_tickers.Security
+            "Ticker": lst_sp500_tickers.Symbol,
+            "Company": lst_sp500_tickers.Security
         }
         lst_sp500_tickers = lst_sp500_tickers['Symbol']
         pd_sp500_tickers = pd.DataFrame.from_dict(dict_sp500_tickers) 
-        pd_sp500_tickers.set_index(['ticker'])
+        pd_sp500_tickers.set_index(['Ticker'])
         print("sp500 tickers done")
 
         # Nasdaq tickers
@@ -54,11 +52,11 @@ def main():
         pd_nasdaq_tickers = pd_nasdaq_tickers_full[['Symbol','Security Name']]
         lst_nasdaq_tickers = pd_nasdaq_tickers['Symbol']
         pd_nasdaq_tickers = pd_nasdaq_tickers.copy()
-        pd_nasdaq_tickers.loc[:, 'ticker'] = pd_nasdaq_tickers['Symbol']
+        pd_nasdaq_tickers.loc[:, 'Ticker'] = pd_nasdaq_tickers['Symbol']
         pd_nasdaq_tickers.drop(columns=['Symbol'], inplace=True)
-        pd_nasdaq_tickers.loc[:, 'company_name'] = pd_nasdaq_tickers['Security Name']
+        pd_nasdaq_tickers.loc[:, 'Company'] = pd_nasdaq_tickers['Security Name']
         pd_nasdaq_tickers.drop(columns=['Security Name'], inplace=True)
-        pd_nasdaq_tickers.set_index(['ticker'])
+        pd_nasdaq_tickers.set_index(['Ticker'])
         pd_nasdaq_tickers.drop(index=pd_nasdaq_tickers.index[-1],axis=0,inplace=True)
         print("nasdaq tickers done")
 
@@ -144,74 +142,74 @@ def main():
                                 'Western Digital Corporation', "What's Cooking Group NV/SA", 'WisdomTree Brent Crude Oil', 'WisdomTree Cybersecurity UCITS ETF USD Acc', 'Wolters Kluwer N.V.', 'Worldline SA', 'X-FAB Silicon Foundries SE', 'Xior Student Housing NV']
         print("Beursrally: " + str(len(lst_beursrally_names)))
         dict_beursrally_tickers = {
-            "ticker": lst_beursrally_tickers,
-            "company_name": lst_beursrally_names
+            "Ticker": lst_beursrally_tickers,
+            "Company": lst_beursrally_names
         }
         pd_beursrally_tickers = pd.DataFrame.from_dict(dict_beursrally_tickers) 
-        pd_beursrally_tickers.set_index(['ticker'])
+        pd_beursrally_tickers.set_index(['Ticker'])
         print("beursrally tickers done")
 
         # Portfolio
         dict_portfolio_tickers = {
-            "ticker": [ "ASML","NVDA","AMZN","PLTR","AVGO","AI","BESI.AS","MRVL","S" ],
-            "company_name":  [ "ASML","Nvidia","Amazon","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone" ]
+            "Ticker": [ "ASML","NVDA","AMZN","PLTR","AVGO","AI","BESI.AS","MRVL","S" ],
+            "Company":  [ "ASML","Nvidia","Amazon","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone" ]
         }
         pd_portfolio_tickers =  pd.DataFrame.from_dict(dict_portfolio_tickers) 
-        lst_portfolio_tickers = pd_portfolio_tickers['ticker'] 
-        pd_portfolio_tickers.set_index(['ticker'])
+        lst_portfolio_tickers = pd_portfolio_tickers['Ticker'] 
+        pd_portfolio_tickers.set_index(['Ticker'])
         print("portfolio tickers done")
 
         # Precious metals
         dict_precious_metals_tickers = {
-            "ticker": [ "GC=F","SI=F","PA=F","PL=F" ],
-            "company_name":  [ "Gold","Silver","Palladium","Platinum" ]
+            "Ticker": [ "GC=F","SI=F","PA=F","PL=F" ],
+            "Company":  [ "Gold","Silver","Palladium","Platinum" ]
         }
         pd_precious_metals_tickers =  pd.DataFrame.from_dict(dict_precious_metals_tickers) 
-        lst_precious_metals_tickers = pd_precious_metals_tickers['ticker'] 
-        pd_precious_metals_tickers.set_index(['ticker'])
+        lst_precious_metals_tickers = pd_precious_metals_tickers['Ticker'] 
+        pd_precious_metals_tickers.set_index(['Ticker'])
         print("precious metals tickers done")
 
         # Exchange rates
         dict_exchange_rates_tickers = {
-            "ticker": [ "EURUSD=X","EURJPY=X","EURRUB=X" ],
-            "company_name": [ "US Dollar", "Japanese Yen", "Russian Rouble"]
+            "Ticker": [ "EURUSD=X","EURJPY=X","EURRUB=X" ],
+            "Company": [ "US Dollar", "Japanese Yen", "Russian Rouble"]
         }
         pd_exchange_rates_tickers = pd.DataFrame.from_dict(dict_exchange_rates_tickers)  
-        lst_exchange_rates_tickers = pd_exchange_rates_tickers['ticker']
-        pd_exchange_rates_tickers.set_index(['ticker'])
+        lst_exchange_rates_tickers = pd_exchange_rates_tickers['Ticker']
+        pd_exchange_rates_tickers.set_index(['Ticker'])
         #print(pd_exchange_rates_tickers)
         print("exchange rates tickers done")       
 
         # Oil
         dict_oil_tickers = {
-            "ticker": [ "CL=F" ],
-            "company_name": [ "Crude oil" ]
+            "Ticker": [ "CL=F" ],
+            "Company": [ "Crude oil" ]
         }
         pd_oil_tickers = pd.DataFrame.from_dict(dict_oil_tickers)
-        lst_oil_tickers = pd_oil_tickers['ticker']
-        pd_oil_tickers.set_index(['ticker'])
+        lst_oil_tickers = pd_oil_tickers['Ticker']
+        pd_oil_tickers.set_index(['Ticker'])
         #print(pd_oil_tickers)
         print("oil tickers done")    
 
         # Crypto
         dict_crypto_tickers = {
-            "ticker": ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"],
-            "company_name": [ "Bitcoin","Ethereum","Binance Coin","Ripple","Solana","Cardano","Dogecoin","Chainlink","Polkadot","Shibu Inu"]
+            "Ticker": ["BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD","DOGE-USD","LINK-USD","DOT-USD","SHIB-USD"],
+            "Company": [ "Bitcoin","Ethereum","Binance Coin","Ripple","Solana","Cardano","Dogecoin","Chainlink","Polkadot","Shibu Inu"]
         }
         pd_crypto_tickers = pd.DataFrame.from_dict(dict_crypto_tickers)  
-        lst_crypto_tickers = pd_crypto_tickers['ticker']
-        pd_crypto_tickers.set_index(['ticker'])
+        lst_crypto_tickers = pd_crypto_tickers['Ticker']
+        pd_crypto_tickers.set_index(['Ticker'])
         #print(pd_crypto_tickers)
         print("crypto tickers done")    
 
         # Other tickers
         dict_other_tickers = {
-            "ticker": [ "VUSA-AS" ],
-            "company_name": [ "Vanguard S&P 500 UCITS ETF" ]
+            "Ticker": [ "VUSA-AS" ],
+            "Company": [ "Vanguard S&P 500 UCITS ETF" ]
         }
         pd_other_tickers = pd.DataFrame.from_dict(dict_other_tickers)  
-        lst_other_tickers = pd_other_tickers['ticker']
-        pd_other_tickers.set_index(['ticker'])
+        lst_other_tickers = pd_other_tickers['Ticker']
+        pd_other_tickers.set_index(['Ticker'])
         print("other tickers done")
 
 
@@ -219,7 +217,7 @@ def main():
         #print("before concat")
         pd_all_tickers = pd.concat([pd_screener_tickers, pd_dow_tickers, pd_sp500_tickers, pd_nasdaq_tickers, pd_beursrally_tickers, pd_portfolio_tickers, pd_precious_metals_tickers, pd_exchange_rates_tickers, pd_oil_tickers, pd_crypto_tickers, pd_other_tickers])
         #print("after concat")
-        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='ticker')
+        pd_all_tickers = pd_all_tickers.drop_duplicates(subset='Ticker')
 
         # Mark tickers
         pd_final_tickers = pd_all_tickers.copy()
@@ -227,49 +225,49 @@ def main():
             #print("loop")
             for my_ticker in lst_screener_tickers:
                 #print("loop")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "screener"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "screener"] = 1
             for my_ticker in lst_dow_tickers:
                 #print("loop dow")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "dow"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "dow"] = 1
             for my_ticker in lst_sp500_tickers:
                 #print("loop sp500")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "sp500"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "sp500"] = 1
             for my_ticker in lst_nasdaq_tickers:
                 #print("loop nasdaq")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "nasdaq"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "nasdaq"] = 1
             for my_ticker in lst_beursrally_tickers:
                 #print("loop beursrally " + my_ticker)
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "beursrally"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "beursrally"] = 1
             for my_ticker in lst_portfolio_tickers:
                 #print("loop beursrally " + my_ticker)
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "portfolio"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "portfolio"] = 1
             for my_ticker in lst_precious_metals_tickers:
                 #print("loop metals)")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "preciousMetals"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "preciousMetals"] = 1
             for my_ticker in lst_exchange_rates_tickers:
                 #print("loop exhchange")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "exchangeRates"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "exchangeRates"] = 1
             for my_ticker in lst_oil_tickers:
                 #print("loop oil")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "oil"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "oil"] = 1
             for my_ticker in lst_crypto_tickers:
                 #print("loop crypto")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "crypto"] = 1
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "crypto"] = 1
             for my_ticker in lst_other_tickers:
                 #print("loop other")
-                if my_ticker == row['ticker']:
-                    pd_final_tickers.loc[pd_final_tickers['ticker'] == my_ticker, "other"] = 1
-        pd_all_tickers['ticker'] = pd_all_tickers['ticker'].str.replace('.', '-', regex=False)
+                if my_ticker == row['Ticker']:
+                    pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "other"] = 1
+        pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False)
         pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn_tickers, if_exists='replace')
         conn_tickers.close()
         print("all done")
