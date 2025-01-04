@@ -41,7 +41,7 @@ def main():
     my_tickers = pd.read_sql(my_ticker_query, my_tickers_conn)
     
     try:
-        my_final_lst = []
+        my_final_df = pd.DataFrame()
         for index, row in my_tickers.iterrows():
             if row['Ticker'] != "BRK.B":
                 print(row['Ticker'])
@@ -49,9 +49,9 @@ def main():
                 my_data_df = pd.read_sql_query(my_data_query,my_data_conn)
                 my_data_df['Ticker'] = row['Ticker']
                 my_data_df.set_index(["Date","Ticker"],inplace=True)
-                my_final_lst.append(my_data_df)
-        print(my_final_lst)
-        my_final_df = pd.concat(my_final_lst, ignore_index=False)
+                my_final_df = pd.concat([my_final_df,my_data_df],ignore_index=True)
+        #print(my_final_lst)
+        #my_final_df = pd.concat(my_final_lst, ignore_index=False)
 
         #my_final_df.to_sql('all_stocks', my_data_conn, if_exists='replace', index=True)
         cur_data.close()
