@@ -50,16 +50,18 @@ def main():
                 my_data_df['Ticker'] = row['Ticker']
                 my_data_df.set_index(["Date","Ticker"],inplace=True)
                 my_final_lst.append(my_data_df)
+        print(my_final_lst)
         my_final_df = pd.concat(my_final_lst, ignore_index=False)
 
-        my_final_df.to_sql('all_stocks', my_data_conn, if_exists='replace', index=True)
+        #my_final_df.to_sql('all_stocks', my_data_conn, if_exists='replace', index=True)
+        cur_data.close()
+        my_data_conn.close()
+        cur_tickers.close()
+        my_tickers_conn.close()
     except Exception as e:
         print(e)
-        
-    cur_data.close()
-    my_data_conn.close()
-    cur_tickers.close()
-    my_tickers_conn.close()
+
+
 
 if __name__ == "__main__":
     main()
