@@ -39,20 +39,23 @@ def main():
     my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
     
     my_tickers = pd.read_sql(my_ticker_query, my_tickers_conn)
-   
-    my_final_lst = []
-    for index, row in my_tickers.iterrows():
-        if row['Ticker'] != "BRK.B":
-            print(row['Ticker'])
-            my_data_query = "SELECT * from '" + row['Ticker'] + "'"
-            my_data_df = pd.read_sql_query(my_data_query,my_data_conn)
-            my_data_df['Ticker'] = row['Ticker']
-            my_data_df.set_index(["Date","Ticker"],inplace=True)
-            my_final_lst.append(my_data_df)
-    my_final_df = pd.concat(my_final_lst, ignore_index=False)
+    
+    try:
+        my_final_lst = []
+        for index, row in my_tickers.iterrows():
+            if row['Ticker'] != "BRK.B":
+                print(row['Ticker'])
+                my_data_query = "SELECT * from '" + row['Ticker'] + "'"
+                my_data_df = pd.read_sql_query(my_data_query,my_data_conn)
+                my_data_df['Ticker'] = row['Ticker']
+                my_data_df.set_index(["Date","Ticker"],inplace=True)
+                my_final_lst.append(my_data_df)
+        my_final_df = pd.concat(my_final_lst, ignore_index=False)
 
-    my_final_df.to_sql('all_stocks', my_data_conn, if_exists='replace', index=True)
-
+        my_final_df.to_sql('all_stocks', my_data_conn, if_exists='replace', index=True)
+    except Exception as e:
+        print(e)
+        
     cur_data.close()
     my_data_conn.close()
     cur_tickers.close()
