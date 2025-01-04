@@ -17,6 +17,10 @@ def remove_percentage_sign(s):
 
 def rename_header(h):
     h = h.replace(' ','_').replace('(','').replace(')','').replace('.','').replace('/','div').capitalize()
+    if h == 'Symbol':
+        h = 'Ticker'
+    if h == 'Company_name':
+        h = 'Company'
     return h
 
 #screener_df = pd.read_csv("screener-stocks.csv")
@@ -37,7 +41,7 @@ else:
 
 #columns = ["rev_growth"]
 for column in screener_df.columns:
-    print(column)
+    #print(column)
     if not pd.api.types.is_numeric_dtype(screener_df[column]):
         contains_percent = screener_df[column].str.contains('%').any()
         if contains_percent:
@@ -146,7 +150,7 @@ screener_df["Total_Rank"] = \
 screener_df["Final_Rank"] = screener_df["Total_Rank"].rank(ascending=True)  # Lower total rank = Higher priority
 
 print("\nRanked DataFrame:")
-print(screener_df.sort_values(by="Final_Rank").head(50)["Company_name"])
+print(screener_df.sort_values(by="Final_Rank").head(50)["Company"])
 
 #screener_df_cleaned = screener_df.dropna(subset=['Profit Margin'])
 #print(screener_df_cleaned['Profit Margin'].dtype)

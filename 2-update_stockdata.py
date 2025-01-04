@@ -53,14 +53,14 @@ def main():
     cur_tickers = conn_tickers.cursor()
 
     # LOAD ticker DATA #
-    my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE screener == 1 OR dow == 1 OR sp500 == 1 OR nasdaq == 1 OR beursrally == 1 OR portfolio == 1 OR crypto == 1 OR preciousMetals == 1 OR exchangeRates == 1 OR oil == 1 OR crypto == 1 OR other == 1"""
-    #my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
+    #my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE screener == 1 OR dow == 1 OR sp500 == 1 OR nasdaq == 1 OR beursrally == 1 OR portfolio == 1 OR crypto == 1 OR preciousMetals == 1 OR exchangeRates == 1 OR oil == 1 OR crypto == 1 OR other == 1"""
+    my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
     
     my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
 
 
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.B', 'BRK-B')
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.B', 'BRK-B')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BF.B', 'BF-B')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('LEN.B', 'LEN-B')
@@ -93,6 +93,7 @@ def main():
             print(f"Traceback Details:\n{traceback_details}")
     print(remaining_tickers)
 
+    print(my_tickers)
     for index,row in my_tickers.iterrows():
             try:
                 print(row['Ticker'] + " " + row['Company'])
