@@ -47,16 +47,14 @@ def main():
 
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
-    conn_data = sqlite3.connect(DB_PATH + "/database/stockradar-lite-data.db")
-    cur_data = conn_data.cursor()
-    conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
-    cur_tickers = conn_tickers.cursor()
+    conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
+    cur = conn.cursor()
 
     # LOAD ticker DATA #
-    my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE screener == 1 OR dow == 1 OR sp500 == 1 OR nasdaq == 1 OR beursrally == 1 OR portfolio == 1 OR crypto == 1 OR preciousMetals == 1 OR exchangeRates == 1 OR oil == 1 OR crypto == 1 OR other == 1"""
-    #my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
+    #my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE screener == 1 OR dow == 1 OR sp500 == 1 OR nasdaq == 1 OR beursrally == 1 OR portfolio == 1 OR crypto == 1 OR preciousMetals == 1 OR exchangeRates == 1 OR oil == 1 OR crypto == 1 OR other == 1"""
+    my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
     
-    my_tickers = pd.read_sql(my_ticker_query, conn_tickers)
+    my_tickers = pd.read_sql(my_ticker_query, conn)
 
 
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
@@ -69,7 +67,7 @@ def main():
     #my_tickers.set_index('ticker', inplace=True)
 
     print("Stock data from " + str(my_start) + " until " + str(my_end))
-    
+
     for index, row in my_tickers.iterrows():
         if index % 500 == 0:
             time.sleep(60)
@@ -80,7 +78,7 @@ def main():
             my_ticker_df = my_ticker.history(start=my_start,end=my_end)
             #print(my_ticker_df)
             if not pd.isnull(my_ticker_df['Close']).all():
-                my_ticker_df.to_sql(row['Ticker'], conn_data, if_exists='replace')
+                my_ticker_df.to_sql(row['Ticker'], conn, if_exists='replace')
             else:
                 print(row['Ticker'] + " has no data.")
                 remaining_tickers.append(my_log)
@@ -98,7 +96,7 @@ def main():
     for index,row in my_tickers.iterrows():
             try:
                 print(row['Ticker'] + " " + row['Company'])
-                my_stock = Stock(conn_data,row['Ticker'],row['Company'], my_start,my_end)
+                my_stock = Stock(conn,row['Ticker'],row['Company'], my_start,my_end)
                 if type(my_stock.stockdata["Close"].iloc[0]) == np.float64:
                     my_stock.dropna()
                     my_stock.stockdata['BB_up'], my_stock.stockdata['BB_mid'], my_stock.stockdata['BB_low'] = ta.BBANDS(my_stock.stockdata['Close'], timeperiod=20)
@@ -134,7 +132,7 @@ def main():
                     #my_stock.stockdata['TEMA5_X_BELOW_TEMA20'] = cross_below(my_stock.stockdata['prevTEMA5'],my_stock.stockdata['TEMA5'],my_stock.stockdata['prevTEMA20'],my_stock.stockdata['TEMA20'])
 
                 
-                    my_stock.stockdata.to_sql(row['Ticker'], conn_data, if_exists='replace', index = True)
+                    my_stock.stockdata.to_sql(row['Ticker'], conn, if_exists='replace', index = True)
         
             except Exception as e:
                 # Get the exception information including the line number
@@ -148,10 +146,9 @@ def main():
                 continue
 
 
-    cur_data.close()
-    conn_data.close()
-    cur_tickers.close()
-    conn_tickers.close()
+    cur.close()
+    conn.close()
+
 
 if __name__ == "__main__":
     main()

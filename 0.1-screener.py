@@ -25,10 +25,10 @@ def rename_header(h):
 
 #screener_df = pd.read_csv("screener-stocks.csv")
 if os.name == 'nt':
-    conn = sqlite3.connect('C:\wamp64\www\html\database\stockradar-lite-tickers.db')
+    conn = sqlite3.connect('C:\wamp64\www\html\database\stockradar-lite.db')
     screener_df = pd.read_csv("C:/Users/idefi/Documents/To backup/Scripts/stockmarket/data/screener-stocks.csv",low_memory=False)
 else:
-    conn = sqlite3.connect('/var/www/html/database/stockradar-lite-tickers.db')
+    conn = sqlite3.connect('/var/www/html/database/stockradar-lite.db')
     screener_df = pd.read_csv("/home/scripts/stockmarket/data/screener-stocks.csv",low_memory=False)
 
 for column in screener_df.columns:

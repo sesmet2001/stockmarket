@@ -10,12 +10,12 @@ def main():
     try:
         #  Define variables
         DB_PATH = os.getenv('DB_PATH')
-        conn_tickers = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
-        conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
+        conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
+        #conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)
 
         # Screener tickers
-        pd_screener_tickers = pd.read_sql_query("SELECT Ticker,Company FROM screener", conn_screener)
+        pd_screener_tickers = pd.read_sql_query("SELECT Ticker,Company FROM screener", conn)
         lst_screener_tickers = pd_screener_tickers['Ticker'].tolist()
         pd_screener_tickers.set_index(['Ticker'])
         print("screener tickers done")
@@ -265,8 +265,8 @@ def main():
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "other"] = 1
         pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False)
-        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn_tickers, if_exists='replace')
-        conn_tickers.close()
+        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn, if_exists='replace')
+        conn.close()
         print("all done")
     except Exception as e:
         # Print error message and traceback details
