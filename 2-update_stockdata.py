@@ -69,6 +69,7 @@ def main():
     #my_tickers.set_index('ticker', inplace=True)
 
     print("Stock data from " + str(my_start) + " until " + str(my_end))
+    
     for index, row in my_tickers.iterrows():
         if index % 500 == 0:
             time.sleep(60)
