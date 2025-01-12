@@ -203,7 +203,7 @@ def main():
 
         # Other tickers
         dict_other_tickers = {
-            "Ticker": [ "VUSA-AS" ],
+            "Ticker": [ "VUSA.AS" ],
             "Company": [ "Vanguard S&P 500 UCITS ETF" ]
         }
         pd_other_tickers = pd.DataFrame.from_dict(dict_other_tickers)  
