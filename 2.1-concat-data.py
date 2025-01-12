@@ -21,6 +21,7 @@ import math
 import numpy as np
 
 def main():      
+    sys.stdout = open('log-21-concat-data.txt','w') 
     # PARAMETERS #
     pd.set_option('display.max_rows', 10)
     pd.set_option('display.max_rows', None)
