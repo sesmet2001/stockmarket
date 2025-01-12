@@ -5,9 +5,11 @@ import pandas as pd
 import sqlite3
 import os
 import traceback
+import sys
 
 def main():
     try:
+        sys.stdout = open('log-1-yahoo_fin_tickers.txt','w') 
         #  Define variables
         DB_PATH = os.getenv('DB_PATH')
         conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
