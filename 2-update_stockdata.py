@@ -58,7 +58,7 @@ def main():
     my_tickers = pd.read_sql(my_ticker_query, conn)
 
 
-    #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
+    my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.A', 'BRK-A')
     my_tickers['Ticker'] = my_tickers['Ticker'].replace('BRK.B', 'BRK-B')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('BF.B', 'BF-B')
     #my_tickers['Ticker'] = my_tickers['Ticker'].replace('PBR.A', 'PBR-A')
