@@ -21,7 +21,7 @@ import math
 import numpy as np
 
 def main():     
-    #sys.stdout = open('log-2-update_stockdata.txt','w') 
+    sys.stdout = open('log-2-update_stockdata.txt','w') 
     # PARAMETERS #
     chunksize = 100
     max_retries = 3
