@@ -21,7 +21,6 @@ import math
 import numpy as np
 
 def main():     
-    sys.stdout = open('log-2-update_stockdata.txt','w') 
     # PARAMETERS #
     chunksize = 100
     max_retries = 3
@@ -41,10 +40,10 @@ def main():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
     #np.set_printoptions(threshold=np.inf)
-    if len(sys.argv) > 1:
-        my_end = datetime.strptime(sys.argv[1], "%Y-%m-%d")     
-    else:
-        my_end = datetime.today().strftime('%Y-%m-%d')
+    #if len(sys.argv) > 1:
+    #    my_end = datetime.strptime(sys.argv[1], "%Y-%m-%d")     
+    #else:
+    my_end = datetime.today().strftime('%Y-%m-%d')
 
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
@@ -52,8 +51,14 @@ def main():
     cur = conn.cursor()
 
     # LOAD ticker DATA #
-    my_indexes = ["other","oil","exchangeRates","preciousMetals","crypto","beursrally","screener","dow","sp500","nasdaq","portfolio"]
 
+
+    my_indexes = ["other","oil","portfolio","exchangeRates","preciousMetals","crypto","beursrally","dow","sp500","screener","nasdaq"]
+    my_indexes = [sys.argv[1]]
+    sys.stdout = open('log-2-update_stockdata' + sys.argv[1] + '.txt','w') 
+
+    print("Start")
+    print(datetime.now())
     for my_index in my_indexes:
         print(my_index)
         my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE """ + my_index + """ == 1;"""
@@ -95,9 +100,10 @@ def main():
                 print(f"Error Message: {e}")
                 traceback_details = traceback.format_exc()
                 print(f"Traceback Details:\n{traceback_details}")
+        print("Remaining tickers:")
         print(remaining_tickers)
 
-        print(my_tickers)
+        #print(my_tickers)
         for index,row in my_tickers.iterrows():
                 try:
                     print(row['Ticker'] + " " + row['Company'])
@@ -150,7 +156,8 @@ def main():
                     print(f"Exception occurred in update-stockdata on line {line_number}: {e}")
                     continue
 
-
+    print("End")
+    print(datetime.now())
     cur.close()
     conn.close()
 
