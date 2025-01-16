@@ -55,7 +55,7 @@ def main():
 
     my_indexes = ["other","oil","portfolio","exchangeRates","preciousMetals","crypto","beursrally","dow","sp500","screener","nasdaq"]
     my_indexes = [sys.argv[1]]
-    sys.stdout = open('log-2-update_stockdata' + sys.argv[1] + '.txt','w') 
+    sys.stdout = open('log-2-update_stockdata_' + sys.argv[1] + '.txt','w') 
 
     print("Start")
     print(datetime.now())
