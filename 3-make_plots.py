@@ -36,7 +36,7 @@ def main():
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
 
-    my_start = datetime(2021, 1, 1)
+    my_start = datetime(2024, 1, 1)
     my_end = datetime.today().strftime('%Y-%m-%d')
     #my_end = datetime.strptime("2023-10-13", '%Y-%m-%d')
     print(my_start)
