@@ -19,7 +19,7 @@ from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
 
 def main():
-    #sys.stdout = open('./log-3-make_plots.txt','w') 
+    sys.stdout = open('./log-3-make_plots.txt','w') 
     # PARAMETERS #
     chunksize = 100
     MACD_FAST = 12
