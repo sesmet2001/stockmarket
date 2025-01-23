@@ -109,6 +109,7 @@ class Stock(Asset):
         except Exception as e:
             print(e)
 
+#hh
     def plotbasegraph(self,my_imagepath,my_plotrange,my_strategies,my_colors):
         try:
             start_time = time.time()
