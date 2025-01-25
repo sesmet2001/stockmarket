@@ -61,6 +61,7 @@ def main():
 
     for my_ticker,my_company in my_tickers:
         try:
+            print(my_ticker)
             my_stock = Stock(conn,my_ticker,my_company,my_start,my_end)
             if type(my_stock.stockdata["Close"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
