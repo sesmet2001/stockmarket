@@ -65,7 +65,8 @@ def main():
             my_stock = Stock(conn,my_ticker,my_company,my_start,my_end)
             if type(my_stock.stockdata["Close"].iloc[0]) == np.float64:
                 print(my_stock.ticker)
-                my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors)
+                duration = timeit.timeit(my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors), number=1)
+                print(f"Duration: {duration:.2f} seconds")                
 
         except Exception as e:
             # Get the exception information including the line number
