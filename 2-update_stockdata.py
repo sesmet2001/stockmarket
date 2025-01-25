@@ -21,6 +21,7 @@ import math
 import numpy as np
 
 def main():     
+    print("hllo")
     # PARAMETERS #
     chunksize = 100
     max_retries = 3
