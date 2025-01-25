@@ -367,7 +367,7 @@ class Stock(Asset):
 
             # Calculate total time taken
             elapsed_time = end_time - start_time
-            #print(f"Execution time: {elapsed_time} seconds")
+            print(f"Execution time: {elapsed_time} seconds")
             return 1
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()

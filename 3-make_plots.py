@@ -4,7 +4,7 @@ from pandas_datareader.data import DataReader
 import pandas as pd
 from datetime import datetime, timedelta
 import yfinance as yf
-import timeit
+import time
 import sqlite3
 import numpy as np
 import sqlite3
@@ -19,7 +19,7 @@ from backtesting.lib import crossover
 from strategies.TEMA_RSI import TEMA_RSI
 
 def main():
-    sys.stdout = open('./log-3-make_plots.txt','w') 
+    #sys.stdout = open('./log-3-make_plots.txt','w') 
     # PARAMETERS #
     chunksize = 100
     MACD_FAST = 12
@@ -46,7 +46,7 @@ def main():
     # test
     #my_ticker_query = """SELECT Ticker FROM _yahoo_fin_tickers WHERE SP500 == 1 OR Dow == 1 OR Portfolio == 1 OR Oil == 1 OR Crypto == 1 OR PreciousMetals == 1 OR ExchangeRates == 1"""
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR SP500 == 1 OR Dow == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'
-    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) LIMIT 5'    
+    my_ticker_query = 'SELECT Ticker,Company FROM _yahoo_fin_tickers WHERE (Screener == 1 OR Beursrally == 1 OR Portfolio == 1 OR SP500 == 1 OR Dow == 1 OR Nasdaq == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1) LIMIT 20'    
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Dow == 1'
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE Ticker=="AAPL"'
     #my_ticker_query = 'SELECT Ticker, Company FROM _yahoo_fin_tickers WHERE (Beursrally == 1 OR Portfolio == 1 OR Other == 1 OR Crypto == 1 OR PreciousMetals == 1 OR Oil == 1 OR ExchangeRates == 1)'    
@@ -64,9 +64,12 @@ def main():
             print(my_ticker)
             my_stock = Stock(conn,my_ticker,my_company,my_start,my_end)
             if type(my_stock.stockdata["Close"].iloc[0]) == np.float64:
-                print(my_stock.ticker)
-                duration = timeit.timeit(my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors), number=1)
-                print(f"Duration: {duration:.2f} seconds")                
+                start_time = time.time()
+                my_stock.plotbasegraph(DB_PATH + "/graphs/",my_plotrange,my_strategies,my_colors)
+                end_time = time.time()
+                duration = end_time - start_time
+                print(f"Duration: {duration:.2f} seconds")
+               
 
         except Exception as e:
             # Get the exception information including the line number
