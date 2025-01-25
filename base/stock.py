@@ -362,11 +362,11 @@ class Stock(Asset):
                 xaxis_rangeslider_visible=False,
                 xaxis=dict(showline=True, zeroline=False, range=[self.plotdata.index.min(), self.plotdata.index.max()]),
             )
-            #print("before printing " + my_imagepath)
+            print("before printing " + my_imagepath)
             pio.write_image(fig, file=my_imagepath + self.ticker + ".png", format="png", engine="kaleido")
             scope = pio.kaleido.scope
-            #print(scope._std_error.getvalue().decode())
-            #print("after printing")
+            print(scope._std_error.getvalue().decode())
+            print("after printing")
             end_time = time.time()
 
             # Calculate total time taken
