@@ -15,6 +15,7 @@ from plotly.subplots import make_subplots
 import time
 import yfinance as yf
 import yahoo_fin.stock_info as si
+import psutil
 
 class Stock(Asset):
     def __init__(self, my_conn, my_ticker, my_company, my_startdate, my_enddate):
@@ -346,6 +347,9 @@ class Stock(Asset):
             #for i,row in TEMA5_X_BELOW_TEMA20.iterrows():
             #    fig.add_vline(x=row.Date2, line_width=2, opacity=0.3, line_dash="dash", line_color="red")
             #fig.update_xaxes(fixedrange=True)
+
+
+            print(f"Memory available: {psutil.virtual_memory().available / 1e6} MB")
             fig.update_layout(
                 #yaxis2=dict(
                 #    range=[0, 100]  # Set the min and max values for the y-axis
