@@ -9,8 +9,9 @@ import sys
 
 def main():
     try:
-        sys.stdout = open('log-1-yahoo_fin_tickers.txt','w') 
+        #sys.stdout = open('log-1-yahoo_fin_tickers.txt','w') 
         #  Define variables
+        print("connect to db")
         DB_PATH = os.getenv('DB_PATH')
         conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
         #conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
@@ -266,8 +267,10 @@ def main():
                 #print("loop other")
                 if my_ticker == row['Ticker']:
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "other"] = 1
-        pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False)
+        #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].astype(str)
+        #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False, inplace=True)
         pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn, if_exists='replace')
+        print(pd_final_tickers)
         conn.close()
         print("all done")
     except Exception as e:
