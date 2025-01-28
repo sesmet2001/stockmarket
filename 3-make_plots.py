@@ -54,6 +54,7 @@ def main():
     cur.execute(my_ticker_query)    
     my_tickers_list = cur.fetchall()
     my_tickers = [x for x in my_tickers_list]
+    print(len(my_tickers_list))
     #my_tickers = [x[0] for x in my_tickers_list]
     #print(my_tickers)
     #my_tickers = ["BABA","CRWD"]
