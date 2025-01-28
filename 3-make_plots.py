@@ -32,7 +32,7 @@ def main():
     print(sys.path)
     
     # DB CONNECTIONS #
-    DB_PATH = os.getenv('DB_PATH')
+    DB_PATH = "/var/www/html" #os.getenv('DB_PATH')
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
 
