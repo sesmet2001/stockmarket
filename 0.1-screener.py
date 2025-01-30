@@ -25,7 +25,7 @@ def rename_header(h):
     return h
 
 def main():
-    sys.stdout = open('log-01-screener.txt','w') 
+    sys.stdout = open('./log-01-screener.txt','w') 
     #screener_df = pd.read_csv("screener-stocks.csv")
     if os.name == 'nt':
         conn = sqlite3.connect('C:\wamp64\www\html\database\stockradar-lite.db')
