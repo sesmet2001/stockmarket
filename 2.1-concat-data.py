@@ -38,10 +38,10 @@ def main():
     #my_ticker_query = """SELECT * FROM _yahoo_fin_tickers WHERE beursrally == 1"""
     
     my_tickers = pd.read_sql(my_ticker_query, conn)
-    
-    try:
-        my_final_df = pd.DataFrame()
-        for index, row in my_tickers.iterrows():
+        
+    my_final_df = pd.DataFrame()
+    for index, row in my_tickers.iterrows():
+        try:
             if (row['Ticker'] != "BRK.B" and row['Ticker'] != "BRK.A"):
                 #print(row['Ticker'])
                 my_data_query = "SELECT * from '" + row['Ticker'] + "'"
@@ -51,15 +51,12 @@ def main():
                 my_final_df = pd.concat([my_final_df,my_data_df],ignore_index=True)
         #print(my_final_lst)
         #my_final_df = pd.concat(my_final_lst, ignore_index=False)
-
-        my_final_df.to_sql('all_stocks', conn, if_exists='replace', index=True)
-        cur.close()
-        conn.close()
-    except Exception as e:
-        print(e)
-        pass
-
-
+        except Exception as e:
+            print(e)
+            pass
+    my_final_df.to_sql('all_stocks', conn, if_exists='replace', index=True)
+    cur.close()
+    conn.close()
 
 if __name__ == "__main__":
     main()
