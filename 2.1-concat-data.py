@@ -43,7 +43,7 @@ def main():
         my_final_df = pd.DataFrame()
         for index, row in my_tickers.iterrows():
             if (row['Ticker'] != "BRK.B" and row['Ticker'] != "BRK.A"):
-                print(row['Ticker'])
+                #print(row['Ticker'])
                 my_data_query = "SELECT * from '" + row['Ticker'] + "'"
                 my_data_df = pd.read_sql_query(my_data_query,conn)
                 my_data_df['Ticker'] = row['Ticker']
