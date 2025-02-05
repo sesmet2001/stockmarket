@@ -59,8 +59,8 @@ def main():
 
     #my_final_df.index = my_final_df.index.astype(Integer)
 
-    #my_final_df['Date'] = my_final_df['Date'].str.strip()
-    #my_final_df['Date'] = pd.to_datetime(my_final_df['Date'])
+    my_final_df['Date'] = my_final_df['Date'].str.strip()
+    my_final_df['Date'] = pd.to_datetime(my_final_df['Date'])
     print(my_final_df.info())
     dtype_dict = {
         #"index": Integer(),
