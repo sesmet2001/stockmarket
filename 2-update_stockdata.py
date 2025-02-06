@@ -52,7 +52,7 @@ def main():
         DB_PATH='C:/wamp64/www/html/'
     else:
         DB_PATH='/var/www/html/'
-        
+
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
 
@@ -138,7 +138,8 @@ def main():
                         my_stock.stockdata['prevSMA50'] = my_stock.stockdata['SMA50'].shift(1)
                         my_stock.stockdata['prevRSI'] = my_stock.stockdata['RSI'].shift(1)  
                         my_stock.stockdata['prevMACD'] = my_stock.stockdata['MACD'].shift(1)  
-                        my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)  
+                        my_stock.stockdata['prevMACDSignal'] = my_stock.stockdata['MACDSignal'].shift(1)
+                        my_stock.stockdata['prevMACDHist'] = my_stock.stockdata['MACDHist'].shift(1)  
                         my_stock.stockdata['MACD_slope'] = np.gradient(my_stock.stockdata['MACD'], 1)
                         my_stock.stockdata['MACD_sign_change'] = np.sign(my_stock.stockdata['MACD_slope']).diff()
 
