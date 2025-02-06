@@ -21,8 +21,8 @@ import math
 import numpy as np
 
 def main():     
-    print("hllo")
     # PARAMETERS #
+    sys.stdout = open('./log-2-update-stockdata.txt','w') 
     chunksize = 100
     max_retries = 3
     MACD_FAST = 12
