@@ -22,6 +22,7 @@ import numpy as np
 
 def main():     
     # PARAMETERS #
+    print("Start")
     chunksize = 100
     max_retries = 3
     MACD_FAST = 12
