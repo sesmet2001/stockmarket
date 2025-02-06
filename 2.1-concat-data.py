@@ -30,7 +30,10 @@ def main():
     pd.set_option('display.width', None)
 
     # DB CONNECTIONS #
-    DB_PATH = os.getenv('DB_PATH')
+    if os.name == 'nt':
+        DB_PATH='C:/wamp64/www/html/'
+    else:
+        DB_PATH='/var/www/html/'
     #conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     engine = create_engine("sqlite:///" + DB_PATH + "/database/stockradar-lite.db", echo=True)
     #cur = conn.cursor()

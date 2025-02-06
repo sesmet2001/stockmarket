@@ -12,7 +12,10 @@ def main():
         #sys.stdout = open('log-1-yahoo_fin_tickers.txt','w') 
         #  Define variables
         print("connect to db")
-        DB_PATH = os.getenv('DB_PATH')
+        if os.name == 'nt':
+            DB_PATH='C:/wamp64/www/html/'
+        else:
+            DB_PATH='/var/www/html/'
         conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
         #conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)
