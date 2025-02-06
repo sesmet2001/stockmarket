@@ -47,6 +47,7 @@ def main():
     my_end = datetime.today().strftime('%Y-%m-%d')
 
     # DB CONNECTIONS #
+    print("before getenv")
     DB_PATH = os.getenv('DB_PATH')
     print("DB_PATH" + DB_PATH)
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
