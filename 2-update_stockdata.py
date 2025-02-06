@@ -48,6 +48,7 @@ def main():
 
     # DB CONNECTIONS #
     DB_PATH = os.getenv('DB_PATH')
+    print("DB_PATH" + DB_PATH)
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
 
