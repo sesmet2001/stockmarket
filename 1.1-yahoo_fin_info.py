@@ -71,11 +71,11 @@ def main():
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
  
-    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers LIMIT 10"""
+    my_tickers = """SELECT Ticker FROM _yahoo_fin_tickers"""
     cur.execute(my_tickers)
     tickers = cur.fetchall()
     tickers = [x[0] for x in tickers]
-    get_info(tickers).to_sql('_yf_info', conn, if_exists='replace')  
+    get_info(tickers).to_sql('_yahoo_fin_tickers', conn, if_exists='replace')  
     #
 
     # # revenue info
