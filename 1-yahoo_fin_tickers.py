@@ -154,8 +154,8 @@ def main():
 
         # Portfolio
         dict_portfolio_tickers = {
-            "Ticker": [ "ASML","NVDA","AMZN","PLTR","AVGO","AI","BESI.AS","MRVL","S" ],
-            "Company":  [ "ASML","Nvidia","Amazon","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone" ]
+            "Ticker": [ "ASML","IEMI","ARM","PLTR","AVGO","AI","BESI.AS","MRVL","S","SFTBY" ],
+            "Company":  [ "ASML","SPDR MSCI ALL Country World","ARM Holdings","Palantir","Broadcom","C3.AI","BE Semiconductor","Marvell Technology","Sentinelone","Softbank Group" ]
         }
         pd_portfolio_tickers =  pd.DataFrame.from_dict(dict_portfolio_tickers) 
         lst_portfolio_tickers = pd_portfolio_tickers['Ticker'] 
