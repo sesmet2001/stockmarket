@@ -6,7 +6,12 @@ import sqlite3
 import time
 
 def main():
-    DB_PATH = os.getenv('DB_PATH')
+    # DB CONNECTIONS #
+    if os.name == 'nt':
+        DB_PATH='C:/wamp64/www/html/'
+    else:
+        DB_PATH='/var/www/html/'
+
     conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
     cur = conn.cursor()
     counter = 0
