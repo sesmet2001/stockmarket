@@ -6,7 +6,7 @@ import sqlite3
 import os
 import traceback
 import sys
-from sqlalchemy import create_engine, String
+from sqlalchemy import create_engine, String, Text
 
 def main():
     try:
@@ -17,12 +17,13 @@ def main():
             DB_PATH='C:/wamp64/www/html/'
         else:
             DB_PATH='/var/www/html/'
-        conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
+        #conn = sqlite3.connect(DB_PATH + "/database/stockradar-lite.db")
+        engine = create_engine('sqlite:///' + DB_PATH + "/database/stockradar-lite.db")
         #conn_screener = sqlite3.connect(DB_PATH + "/database/stockradar-lite-tickers.db")
         pd.set_option('display.max_columns', None)
 
         # Screener tickers
-        pd_screener_tickers = pd.read_sql_query("SELECT Ticker,Company FROM screener", conn)
+        pd_screener_tickers = pd.read_sql_query("SELECT Ticker,Company FROM screener", con=engine)
         lst_screener_tickers = pd_screener_tickers['Ticker'].tolist()
         pd_screener_tickers.set_index(['Ticker'])
         print("screener tickers done")
@@ -274,10 +275,11 @@ def main():
         #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].astype(str)
         #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False, inplace=True)
         pd_final_tickers['Ticker'] = pd_final_tickers['Ticker'].astype(str)
+        pd_final_tickers['Ticker'].fillna("UNKNOWN", inplace=True) 
 
-        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn, if_exists='replace', dtype={'Ticker': String(10)})
+        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=engine, if_exists='replace',dtype={'Ticker': Text})
         print(pd_final_tickers)
-        conn.close()
+        
         print("all done")
     except Exception as e:
         # Print error message and traceback details
