@@ -64,7 +64,7 @@ def main():
         
     info_df = pd.DataFrame(columns=column_names)
  
-    tickers_sql = """SELECT Ticker FROM _yahoo_fin_tickers LIMIT 500"""
+    tickers_sql = """SELECT Ticker FROM _yahoo_fin_tickers"""
     cur.execute(tickers_sql)
     my_tickers = cur.fetchall()
     print(my_tickers)
