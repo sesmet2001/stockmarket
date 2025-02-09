@@ -82,7 +82,7 @@ def main():
             print("Going to sleep 10 sec.")
             time.sleep(60)
     print(info_df)
-    return info_df.to_sql('_yahoo_fin_info', conn, if_exists='replace')  
+    return info_df.to_sql('_yahoo_fin_tickers', conn, if_exists='replace')  
 
     # # revenue info
     # my_tickers = """SELECT Symbol FROM _yf_financials_revenue_scores WHERE `Total Revenue` > 1000000 ORDER BY RevenuePctChange DESC LIMIT 100"""
