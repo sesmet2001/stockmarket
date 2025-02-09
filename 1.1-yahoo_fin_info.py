@@ -59,12 +59,12 @@ def main():
         
     info_df = pd.DataFrame(columns=column_names)
  
-    tickers_sql = """SELECT Ticker,Company FROM _yahoo_fin_tickers"""
+    tickers_sql = """SELECT Ticker FROM _yahoo_fin_tickers"""
     cur.execute(tickers_sql)
     my_tickers = cur.fetchall()
     print(my_tickers)
-    #my_tickers = [x[0] for x in my_tickers]
-    for my_ticker, my_company in my_tickers:
+    my_tickers = [x[0] for x in my_tickers]
+    for my_ticker in my_tickers:
         print(str(counter) + ": " + my_ticker)
         try:
             my_ticker_obj = yf.Ticker(my_ticker)
@@ -72,7 +72,6 @@ def main():
             my_ticker_info_filtered = { key:value for key, value in my_ticker_info.items() if key in column_names }
             my_ticker_info_filtered_df = pd.DataFrame(my_ticker_info_filtered,index=[0])
             my_ticker_info_filtered_df['Ticker'] = my_ticker
-            my_ticker_info_filtered_df['Company'] = my_company
             info_df = pd.concat([info_df,my_ticker_info_filtered_df],ignore_index=True)
         except Exception as e:
             print(e)
@@ -82,7 +81,7 @@ def main():
             print("Going to sleep 10 sec.")
             time.sleep(60)
     print(info_df)
-    return info_df.to_sql('_yahoo_fin_tickers', conn, if_exists='replace')  
+    return info_df.to_sql('_yahoo_fin_info', conn, if_exists='replace')  
 
     # # revenue info
     # my_tickers = """SELECT Symbol FROM _yf_financials_revenue_scores WHERE `Total Revenue` > 1000000 ORDER BY RevenuePctChange DESC LIMIT 100"""
