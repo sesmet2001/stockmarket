@@ -6,6 +6,7 @@ import sqlite3
 import os
 import traceback
 import sys
+from sqlalchemy import create_engine, String
 
 def main():
     try:
@@ -272,7 +273,9 @@ def main():
                     pd_final_tickers.loc[pd_final_tickers['Ticker'] == my_ticker, "other"] = 1
         #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].astype(str)
         #pd_all_tickers['Ticker'] = pd_all_tickers['Ticker'].str.replace('.', '-', regex=False, inplace=True)
-        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn, if_exists='replace')
+        pd_final_tickers['Ticker'] = pd_final_tickers['Ticker'].astype(str)
+
+        pd_final_tickers.to_sql('_yahoo_fin_tickers', con=conn, if_exists='replace', dtype={'Ticker': String(10)})
         print(pd_final_tickers)
         conn.close()
         print("all done")
